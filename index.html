@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+  // If this page is loaded on the surf subdomain, send it to the surf report.
+  // Both subdomains point at the same Pages project, so we route by hostname here.
+  if (location.hostname.startsWith("surf.") && !location.pathname.includes("surf-report")) {
+    location.replace("/surf-report.html");
+  }
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Beach Report — Oregon Coast Conditions, Tides & Surf · J. Burke Photos</title>
@@ -304,6 +311,9 @@ function rotateHero(){
 
 /* ---------- helpers ---------- */
 const fmt=v=>(v==null||isNaN(v))?"—":(+v).toFixed(0);
+// wind: show both mph and kt, e.g. "12 mph (10 kt)"
+const ktBoth=kt=>(kt==null||isNaN(kt))?"—":`${Math.round(kt*1.151)} mph <span style="opacity:0.6;">(${Math.round(kt)} kt)</span>`;
+const ktMph=kt=>(kt==null||isNaN(kt))?"—":`${Math.round(kt*1.151)}`;
 function fmtTime(iso){const m=(iso||"").match(/(\d{1,2}):(\d{2})/);if(!m)return iso;let h=+m[1];const ap=h>=12?"pm":"am";h=h%12||12;return `${h}:${m[2]}${ap}`;}
 
 /* ---------- render TODAY ---------- */
@@ -360,7 +370,7 @@ function renderToday(){
         <div class="m"><span class="k">Now</span><span class="v">${fmt(d.weather?.nowF)}<span>°F</span></span></div>
         <div class="m"><span class="k">High</span><span class="v">${fmt(d.weather?.highF)}<span>°F</span></span></div>
         <div class="m"><span class="k">Rain</span><span class="v">${fmt(d.weather?.rainPct)}<span>%</span></span></div>
-        <div class="m"><span class="k">Wind</span><span class="v">${fmt(d.weather?.windKt)}<span> kt</span></span></div>
+        <div class="m"><span class="k">Wind</span><span class="v">${ktBoth(d.weather?.windKt)}</span></div>
         <div class="m"><span class="k">${d.weather?.foggy?"Visibility":"Cloud"}</span><span class="v">${d.weather?.foggy?(d.weather.visKm??"—")+"<span>km</span>":fmt(d.weather?.cloudPct)+"<span>%</span>"}</span></div>
       </div>
     </div>` : "";
@@ -597,7 +607,7 @@ function renderSurf(){
     <div class="panel">
       <h3>Surf forecast <span class="tag">7-day · primary + secondary swell</span></h3>
       <p style="margin-top:0.7rem;font-size:0.88rem;color:var(--foam-dim);line-height:1.5;">
-        The full surf report — 7-day swell, primary &amp; secondary components, hourly wind, the local-calls board, and the daily email — lives on the dedicated surf page.
+        The full surf report — 7-day swell, primary &amp; secondary components, hourly wind, and the local-calls board — lives on the dedicated surf page.
       </p>
       <a class="btn" style="display:inline-block;margin-top:1rem;background:var(--kelp);color:var(--abyss);font-weight:700;text-decoration:none;padding:0.6rem 1.3rem;border-radius:100px;" href="https://surf.jburkephotos.com">Open the full Surf Report →</a>
       <div style="margin-top:1rem;font-size:0.82rem;color:var(--foam-dim);">Right now at buoy 46050: <b style="color:var(--foam)">${beachData?.surfHeight!=null?beachData.surfHeight.toFixed(1)+" ft":"—"}</b></div>
