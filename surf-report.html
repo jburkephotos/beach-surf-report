@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oregon Coast Surf Report — Swell Reader</title>
+<title>The Surf Report — Oregon Coast Swell, Wind & Tides · J. Burke Photos</title>
 <link rel="preconnect" href="https://challenges.cloudflare.com">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 <style>
@@ -17,14 +17,24 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{font-family:'Archivo',sans-serif;
-    background:radial-gradient(ellipse 120% 80% at 50% -10%,#14333d 0%,transparent 55%),linear-gradient(180deg,var(--abyss) 0%,var(--deep) 100%);
-    background-attachment:fixed;color:var(--foam);min-height:100vh;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
+    background:var(--abyss);
+    color:var(--foam);min-height:100vh;-webkit-font-smoothing:antialiased;padding-bottom:3rem;position:relative;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 1.25rem;}
   header{padding:2.5rem 0 1.25rem;border-bottom:1px solid var(--line);}
   .brand{display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;}
   .brand h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:900;letter-spacing:-0.03em;line-height:0.95;}
   .brand h1 .reader{color:var(--kelp);}
   .tagline{font-family:'Spline Sans Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--foam-dim);margin-top:0.7rem;}
+  /* shared family treatment: hero photo + byline + cross-link */
+  #hero-bg{position:fixed;inset:0;z-index:-2;background-size:cover;background-position:center;transition:opacity 1.5s ease;opacity:0;}
+  #hero-bg.show{opacity:1;}
+  #hero-scrim{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(10,20,24,0.74) 0%,rgba(10,20,24,0.88) 40%,rgba(10,20,24,0.96) 100%);}
+  .brandrow{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .byline{font-family:'Spline Sans Mono',monospace;font-size:0.66rem;letter-spacing:0.08em;color:var(--foam-dim);text-align:right;line-height:1.6;}
+  .byline a{color:var(--kelp);text-decoration:none;font-weight:600;}
+  .byline a:hover{text-decoration:underline;}
+  .crosslink{display:inline-flex;align-items:center;gap:0.4rem;margin-top:1rem;font-family:'Archivo';font-size:0.82rem;font-weight:700;color:var(--foam);background:var(--glass);border:1px solid var(--line);border-radius:100px;padding:0.45rem 1rem;text-decoration:none;transition:all 0.15s ease;}
+  .crosslink:hover{border-color:var(--kelp);color:var(--kelp);}
 
   /* spot selector */
   .spotbar{display:flex;gap:0.5rem;flex-wrap:wrap;padding:1.4rem 0 0.25rem;}
@@ -109,15 +119,26 @@
 
   footer{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--line);font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);line-height:1.7;}
   footer a{color:var(--kelp);text-decoration:none;}
-  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}#hero-bg{opacity:1;}}
 </style>
 </head>
 <body>
+<div id="hero-bg"></div>
+<div id="hero-scrim"></div>
+
 <div class="wrap">
 
   <header>
-    <div class="brand"><h1>Swell<span class="reader"> Reader</span></h1></div>
-    <div class="tagline">Oregon Coast surf data · swells · hourly · tides · cams</div>
+    <div class="brandrow">
+      <div class="brand">
+        <h1>The Surf <span class="reader">Report</span></h1>
+        <div class="tagline">Oregon Coast · swell · wind · tides · local calls</div>
+      </div>
+      <div class="byline">
+        photography &amp; project by<br><a href="https://jburkephotos.com" target="_blank" rel="noopener">J. Burke Photos</a>
+      </div>
+    </div>
+    <a class="crosslink" href="https://beach.jburkephotos.com">🏖 Beach Report →</a>
     <div class="spotbar" id="spotbar"><span class="ctl-label">Spot</span></div>
     <div class="nowbar" id="nowbar"><div class="nm"><span class="label">Loading…</span><span class="val">—</span></div></div>
   </header>
@@ -157,7 +178,10 @@
     <div class="hourly-wrap"><table class="hourly" id="hourly"></table></div>
   </div>
 
-  <div class="panel" id="signupPanel">
+  <!-- DAILY EMAIL SIGNUP — hidden for launch (email not set up yet).
+       To re-enable later: remove style="display:none" below AND set MAIL_URL
+       in the script to your deployed mail worker's /subscribe URL. -->
+  <div class="panel" id="signupPanel" style="display:none;">
     <h3>Get the daily call <span class="tag">free · every morning</span></h3>
     <p style="color:var(--foam-dim);font-size:0.88rem;line-height:1.55;margin-top:0.5rem;max-width:54ch;">One email each morning with the day's swell, wind, and tides for your home break. No spam, unsubscribe anytime.</p>
     <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:1rem;align-items:center;">
@@ -180,6 +204,12 @@ const MAIL_URL = "https://swell-reader-mail.YOURNAME.workers.dev/subscribe";
 // Cloudflare Turnstile public site key. Get one free in the CF dashboard
 // (Turnstile → Add site). Leave as "" to disable the bot check entirely.
 const TURNSTILE_SITEKEY = "YOUR_TURNSTILE_SITEKEY";
+// Rotating hero photos — same array as the Beach Report so the two pages
+// feel like one product. Drop in your J. Burke image URLs (Shopify CDN, etc.)
+const HERO_PHOTOS = [
+  // "https://jburkephotos.com/cdn/shop/files/secret-beach.jpg",
+  // "https://jburkephotos.com/cdn/shop/files/yaquina-head.jpg",
+];
 
 const REPORT_LABELS = [
   { key:"firing", cls:"firing", text:"🔥 Firing", color:"#e9b949" },
@@ -273,7 +303,7 @@ function windBlock(d){
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap;">
           <span style="color:${col};font:600 1.6rem 'Spline Sans Mono';">${kt!=null?kt.toFixed(0):"—"} kt</span>
-          <span style="font:500 0.8rem 'Spline Sans Mono';color:var(--foam-dim);">${gust!=null?`G${gust.toFixed(0)} · `:""}from ${dirName(dir)}</span>
+          <span style="font:500 0.8rem 'Spline Sans Mono';color:var(--foam-dim);">${kt!=null?`(${Math.round(kt*1.151)} mph) · `:""}${gust!=null?`G${gust.toFixed(0)} · `:""}from ${dirName(dir)}</span>
           <span style="margin-left:auto;font:500 0.6rem 'Spline Sans Mono';color:${col};letter-spacing:0.1em;">WIND</span>
         </div>
         <div style="font-size:0.8rem;color:var(--foam-dim);line-height:1.45;margin-top:0.3rem;">
@@ -327,7 +357,7 @@ function render(){
     <div class="nm"><span class="label">Combined</span><span class="val">${fmt(cur.waveFt)}<span> ft</span></span></div>
     <div class="nm"><span class="label">Primary swell</span><span class="val pri">${fmt(cur.swellFt)}<span> ft · ${fmt(cur.swellPer)}s ${dirName(cur.swellDir)}</span></span></div>
     <div class="nm"><span class="label">Secondary (wind)</span><span class="val sec">${fmt(cur.windWaveFt)}<span> ft · ${fmt(cur.windWavePer)}s ${dirName(cur.windWaveDir)}</span></span></div>
-    <div class="nm"><span class="label">Wind</span><span class="val">${fmt(cur.windKt)}<span> kt ${dirName(cur.windDir)}</span></span></div>
+    <div class="nm"><span class="label">Wind</span><span class="val">${fmt(cur.windKt)}<span> kt${cur.windKt!=null?` · ${Math.round(cur.windKt*1.151)} mph`:""} ${dirName(cur.windDir)}</span></span></div>
     ${b&&b.waterF!=null?`<div class="nm"><span class="label">Water</span><span class="val">${b.waterF.toFixed(0)}<span>°F</span></span></div>`:""}
     <div class="src-note">${d.spot?.name||""}<br>${d.demo?"DEMO DATA":"Open-Meteo + NOAA"}</div>`;
 
@@ -635,6 +665,19 @@ document.getElementById("rangeBtns").addEventListener("click",e=>{
 
 buildSpotbar();
 load();
+
+/* rotating hero photo — matches the Beach Report */
+let heroIdx=0;
+function rotateHero(){
+  const el=document.getElementById("hero-bg"); if(!el)return;
+  if(!HERO_PHOTOS.length){ el.style.background="linear-gradient(135deg,#16323d,#0a1418)"; el.classList.add("show"); return; }
+  const url=HERO_PHOTOS[heroIdx % HERO_PHOTOS.length];
+  const img=new Image();
+  img.onload=()=>{ el.style.backgroundImage=`url('${url}')`; el.classList.add("show"); };
+  img.src=url; heroIdx++;
+}
+rotateHero();
+setInterval(rotateHero, 12000);
 </script>
 </body>
 </html>
