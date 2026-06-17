@@ -241,6 +241,16 @@ let activeDays = 3;
 let lastData = null;
 
 /* ---- demo fallback so page renders before Worker is live ---- */
+function demoFace(combinedFt, perS){
+  if(combinedFt==null||perS==null||combinedFt<=0||perS<=0)return null;
+  const g=9.81,FT=3.28084,H0=combinedFt/FT;
+  const HbRaw=0.39*Math.pow(g,0.2)*Math.pow(perS*H0*H0,0.4);
+  const periodEff=Math.min(0.9,0.30+0.04*perS),CAL=0.62;
+  const mid=HbRaw*FT*periodEff*CAL; if(!isFinite(mid)||mid<=0)return null;
+  const lbl=ft=>ft<1?"flat":ft<2?"ankle to knee":ft<3?"knee to waist":ft<4?"waist":ft<5?"waist to chest":ft<6?"chest to shoulder":ft<8?"shoulder to head":ft<10?"head high+":"overhead";
+  const r1=x=>Math.round(x*10)/10;
+  return { low:r1(mid*0.85), high:r1(mid*1.15), setHigh:r1(mid*1.5), label:lbl(mid) };
+}
 function demoData(spotKey, days){
   days = days || activeDays || 3;
   const windOnly = days===10;
@@ -258,6 +268,8 @@ function demoData(spotKey, days){
       row.swellFt=+sw.toFixed(1); row.swellDir=282; row.swellPer=+(12+Math.sin(i/11)).toFixed(1);
       row.windWaveFt=+ww.toFixed(1); row.windWaveDir=200; row.windWavePer=+(5+Math.sin(i/7)).toFixed(1);
       row.waveFt=+(sw+ww*0.5).toFixed(1); row.waveDir=280; row.wavePer=+(11+Math.sin(i/11)).toFixed(1);
+      // demo face estimate (same formula as worker, calibrated)
+      row.face=demoFace(row.waveFt, row.wavePer);
     }
     hrs.push(row);
   }
@@ -354,7 +366,8 @@ function render(){
 
   // now bar
   document.getElementById("nowbar").innerHTML=`
-    <div class="nm"><span class="label">Combined</span><span class="val">${fmt(cur.waveFt)}<span> ft</span></span></div>
+    ${cur.face?`<div class="nm"><span class="label">Est. face <span style="opacity:0.6;">at the beach</span></span><span class="val" style="color:var(--kelp);">${cur.face.low}–${cur.face.high}<span> ft · ${cur.face.label}</span></span></div>`:""}
+    <div class="nm"><span class="label">Combined <span style="opacity:0.6;">offshore</span></span><span class="val">${fmt(cur.waveFt)}<span> ft</span></span></div>
     <div class="nm"><span class="label">Primary swell</span><span class="val pri">${fmt(cur.swellFt)}<span> ft · ${fmt(cur.swellPer)}s ${dirName(cur.swellDir)}</span></span></div>
     <div class="nm"><span class="label">Secondary (wind)</span><span class="val sec">${fmt(cur.windWaveFt)}<span> ft · ${fmt(cur.windWavePer)}s ${dirName(cur.windWaveDir)}</span></span></div>
     <div class="nm"><span class="label">Wind</span><span class="val">${fmt(cur.windKt)}<span> kt${cur.windKt!=null?` · ${Math.round(cur.windKt*1.151)} mph`:""} ${dirName(cur.windDir)}</span></span></div>
@@ -388,6 +401,10 @@ function render(){
         Primary is the groundswell (longer period, traveled far — the organized energy).
         Secondary is local wind-chop. Big gap between their directions usually means a messier surface.
       </div>
+      ${cur.face?`<div style="font-size:0.78rem;color:var(--foam-dim);line-height:1.5;border-top:1px solid var(--line);padding-top:0.7rem;">
+        <b style="color:var(--kelp);">Est. face ${cur.face.low}–${cur.face.high} ft (${cur.face.label}), sets to ${cur.face.setHigh} ft.</b>
+        This is an estimate — offshore swell shrinks as it crosses the shallows, so the breaking face is smaller than the combined buoy height. Longer-period swell holds more size. Treat it as a ballpark, not a guarantee.
+      </div>`:""}
       ${d.spotFit?`<div style="font-size:0.82rem;line-height:1.5;border-top:1px solid var(--line);padding-top:0.7rem;margin-top:0.1rem;">
         <span style="color:${d.spotFit.dirFit==='ideal'?'var(--kelp)':d.spotFit.dirFit==='poor'?'var(--coral)':'var(--sky)'};font-weight:700;">This break: ${d.spotFit.summary}</span>
         <span style="color:var(--foam-dim);"> ${d.spotFit.dirNote}. ${d.tuning?.note||''}</span>

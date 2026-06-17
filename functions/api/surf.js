@@ -156,6 +156,8 @@ async function getForecast(spot, marineDays, reqDays, windOnly) {
         row.windWaveFt  = round1(H.wind_wave_height?.[mi]);
         row.windWaveDir = H.wind_wave_direction?.[mi] ?? null;
         row.windWavePer = round1(H.wind_wave_period?.[mi]);
+        // estimated breaking face height at the beach (calibrated, not a full model)
+        row.face = faceEstimate(row.waveFt, row.wavePer || row.swellPer);
       }
       out.push(row);
     }
@@ -204,6 +206,44 @@ async function getTides() {
 }
 
 const round1 = x => (x == null || isNaN(x) ? null : Math.round(x * 10) / 10);
+
+// ----------------------------------------------------------------------------
+// ESTIMATED BREAKING FACE HEIGHT (calibrated approximation, NOT a full model)
+// ----------------------------------------------------------------------------
+// Translates offshore combined wave height + period into a rough estimate of
+// the rideable face height at the beach, plus a set-wave range. Based on linear
+// wave shoaling (Komar) with a period-efficiency weighting and a calibration
+// factor tuned against observed local conditions. Long-period groundswell keeps
+// more energy to the beach than short-period windswell of the same height.
+// This is intentionally honest about being an estimate — raw buoy/combined
+// numbers stay visible alongside it.
+function faceEstimate(combinedFt, perS){
+  if(combinedFt==null || perS==null || combinedFt<=0 || perS<=0) return null;
+  const g=9.81, FT=3.28084;
+  const H0 = combinedFt/FT;                                  // meters
+  const HbRaw = 0.39*Math.pow(g,0.2)*Math.pow(perS*H0*H0,0.4); // Komar breaking height, m
+  const periodEff = Math.min(0.9, 0.30 + 0.04*perS);         // groundswell survives better
+  const CAL = 0.62;                                          // calibrated to local reality
+  const mid = HbRaw*FT*periodEff*CAL;                        // feet
+  if(!isFinite(mid) || mid<=0) return null;
+  return {
+    low:  round1(mid*0.85),
+    high: round1(mid*1.15),
+    setHigh: round1(mid*1.5),
+    label: faceLabel(mid),
+  };
+}
+function faceLabel(ft){
+  if(ft<1)return"flat";
+  if(ft<2)return"ankle to knee";
+  if(ft<3)return"knee to waist";
+  if(ft<4)return"waist";
+  if(ft<5)return"waist to chest";
+  if(ft<6)return"chest to shoulder";
+  if(ft<8)return"shoulder to head";
+  if(ft<10)return"head high+";
+  return"overhead";
+}
 
 // Bathymetry-tuned "does the current swell suit THIS break?" read.
 // Uses the hand-tuned SPOT_TUNING (derived from BlueTopo + local knowledge)
