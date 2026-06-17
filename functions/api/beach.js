@@ -437,6 +437,7 @@ function buildPhoto(w, tides, surfFt){
 
 // ---------- helpers ----------
 const r1=x=>(x==null||isNaN(x)?null:Math.round(x*10)/10);
+function fmtTime(iso){ const m=(iso||"").match(/(\d{1,2}):(\d{2})/); if(!m)return iso; let h=+m[1];const ap=h>=12?"pm":"am";h=h%12||12;return `${h}:${m[2]}${ap}`; }
 function hm(iso){ const m=(iso||"").match(/(\d{1,2}):(\d{2})/); return m?(+m[1]*60+ +m[2]):null; }
 function min2iso(mins){ const h=Math.floor(mins/60), m=mins%60; return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`; }
 function addMin(iso,delta){ const m=(iso||"").match(/T?(\d{1,2}):(\d{2})/); if(!m)return iso; let tot=+m[1]*60+ +m[2]+delta; tot=(tot+1440)%1440; const h=Math.floor(tot/60),mm=tot%60; return `${String(h).padStart(2,"0")}:${String(mm).padStart(2,"0")}`; }
