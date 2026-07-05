@@ -127,7 +127,7 @@ async function getAlerts(){
 // ---------- 2. daylight weather ----------
 async function getWeather(spot){
   const u=`https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}`+
-    `&hourly=temperature_2m,apparent_temperature,precipitation_probability,cloud_cover,visibility,wind_speed_10m,wind_gusts_10m,uv_index`+
+    `&hourly=temperature_2m,apparent_temperature,precipitation_probability,cloud_cover,visibility,wind_speed_10m,wind_gusts_10m,wind_direction_10m,uv_index`+
     `&daily=sunrise,sunset,uv_index_max,precipitation_probability_max,temperature_2m_max`+
     `&timezone=America%2FLos_Angeles&forecast_days=1&temperature_unit=fahrenheit&wind_speed_unit=kn`;
   const r=await fetch(u,{cf:{cacheTtl:900}});
@@ -148,6 +148,7 @@ async function getWeather(spot){
     visKm: vis!=null ? r1(vis/1000) : null,
     windKt: r1(H.wind_speed_10m?.[i]),
     gustKt: r1(H.wind_gusts_10m?.[i]),
+    windDirDeg: H.wind_direction_10m?.[i] ?? null,
     uv: r1(H.uv_index?.[i]),
     uvMax: r1(D.uv_index_max?.[0]),
     sunrise: D.sunrise?.[0]||null,

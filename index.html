@@ -11,6 +11,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Beach Report — Oregon Coast Conditions, Tides & Surf · J. Burke Photos</title>
+<meta name="description" content="Should you go to the beach today? Live Oregon Coast conditions — 14-day tide chart, wind, tidepool windows, sunset & photo light, beach fire conditions, and official NWS safety alerts for Newport, Lincoln City, Pacific City, Otter Rock and more.">
+<link rel="canonical" href="https://beach.jburkephotos.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Beach Report · J. Burke Photos">
+<meta property="og:title" content="The Beach Report — Oregon Coast Conditions, Tides & Surf">
+<meta property="og:description" content="Live Oregon Coast beach conditions: 14-day tides, wind, tidepool windows, sunset light, and NWS safety alerts for nine beaches from Seaside to Port Orford.">
+<meta property="og:url" content="https://beach.jburkephotos.com/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0a1418">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "The Beach Report",
+  "url": "https://beach.jburkephotos.com/",
+  "description": "Live Oregon Coast beach conditions: 14-day tide chart, wind, tidepool windows, sunset and photography light, beach fire conditions, and official NWS safety alerts for nine Oregon beaches.",
+  "applicationCategory": "Weather",
+  "operatingSystem": "Web",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+  "creator": {
+    "@type": "Person",
+    "name": "Jeremy Burke",
+    "url": "https://jburkephotos.com"
+  },
+  "about": [
+    {"@type": "Place", "name": "Oregon Coast"},
+    {"@type": "Place", "name": "Newport, Oregon"},
+    {"@type": "Place", "name": "Lincoln City, Oregon"}
+  ]
+}
+</script>
 <link rel="preconnect" href="https://challenges.cloudflare.com">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 <style>
@@ -108,7 +139,14 @@
   .panel{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:1.25rem 1.35rem;margin-bottom:1rem;}
   .panel h3{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;}
   .panel h3 .tag{font-family:'Spline Sans Mono',monospace;font-size:0.57rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--foam-dim);font-weight:400;margin-left:auto;}
-  #tideChart{width:100%;height:150px;display:block;margin-top:0.6rem;touch-action:pan-y;}
+  /* continuous 14-day tide scroller */
+  .tide-scroll{overflow-x:auto;overflow-y:hidden;margin-top:0.8rem;-webkit-overflow-scrolling:touch;
+    border-radius:10px;background:rgba(0,0,0,0.15);cursor:grab;overscroll-behavior-x:contain;}
+  .tide-scroll:active{cursor:grabbing;}
+  .tide-scroll::-webkit-scrollbar{height:6px;}
+  .tide-scroll::-webkit-scrollbar-thumb{background:rgba(160,190,190,0.25);border-radius:3px;}
+  .tide-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);}
+  #tideChart{height:260px;display:block;touch-action:pan-x pan-y;}
   .tide-nav{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;}
   .tide-arrow{background:var(--glass);border:1px solid var(--line);color:var(--foam);font-size:1.3rem;line-height:1;width:38px;height:38px;border-radius:50%;cursor:pointer;flex:none;transition:all 0.15s ease;display:grid;place-items:center;}
   .tide-arrow:hover{border-color:var(--kelp);color:var(--kelp);}
@@ -117,6 +155,14 @@
   .tide-sub{font-family:'Spline Sans Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--foam-dim);margin-top:0.4rem;display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;justify-content:center;}
   .tide-sub .tag-inline{color:var(--sky);}
   .tide-swipe-hint{font-family:'Spline Sans Mono',monospace;font-size:0.58rem;color:var(--foam-dim);text-align:center;margin-top:0.7rem;opacity:0.7;}
+  /* wind panel (shared design language with the Surf Report) */
+  .wind-row{display:flex;align-items:center;gap:1.1rem;}
+  .wind-row .dial{width:74px;height:74px;flex:none;}
+  .wind-row .wr-main{display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap;}
+  .wind-row .wr-kt{font:600 1.6rem 'Spline Sans Mono',monospace;}
+  .wind-row .wr-sub{font:500 0.8rem 'Spline Sans Mono',monospace;color:var(--foam-dim);}
+  .wind-row .wr-tag{margin-left:auto;font:500 0.6rem 'Spline Sans Mono',monospace;letter-spacing:0.1em;}
+  .wind-row .wr-why{font-size:0.82rem;color:var(--foam-dim);line-height:1.45;margin-top:0.3rem;}
   .tide-list{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.6rem;font-family:'Spline Sans Mono',monospace;font-size:0.72rem;}
   .tide-list .ti{display:flex;flex-direction:column;gap:0.1rem;}
   .tide-list .ti .ty{color:var(--foam-dim);font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;}
@@ -171,6 +217,22 @@
   <section class="view on" id="view-today">
     <div id="safetyBand" class="safety-band"></div>
     <div id="beachDay"></div>
+    <h3 class="block">Wind right now</h3>
+    <div id="windMount"></div>
+    <h3 class="block">Tides · next 14 days</h3>
+    <div id="tideMountToday">
+      <div class="panel" id="tidePanel">
+        <div class="tide-nav">
+          <button class="tide-arrow" id="tidePrev" aria-label="Previous day">‹</button>
+          <div class="tide-date" id="tideDate">—</div>
+          <button class="tide-arrow" id="tideNext" aria-label="Next day">›</button>
+        </div>
+        <div class="tide-sub"><span class="tag-inline">South Beach · Yaquina Bay</span> <span id="tideDayHint"></span></div>
+        <div class="tide-scroll" id="tideScroll"><canvas id="tideChart"></canvas></div>
+        <div class="tide-list" id="tideList"></div>
+        <div class="tide-swipe-hint" id="tideSwipeHint">one continuous wave — swipe, drag, or use ‹ › to ride through 14 days</div>
+      </div>
+    </div>
     <h3 class="block">Worth seeing today</h3>
     <div class="moments" id="moments"></div>
     <h3 class="block">Beach fire tonight?</h3>
@@ -181,17 +243,7 @@
 
   <!-- TIDES -->
   <section class="view" id="view-tides">
-    <div class="panel">
-      <div class="tide-nav">
-        <button class="tide-arrow" id="tidePrev" aria-label="Previous day">‹</button>
-        <div class="tide-date" id="tideDate">—</div>
-        <button class="tide-arrow" id="tideNext" aria-label="Next day">›</button>
-      </div>
-      <div class="tide-sub"><span class="tag-inline">South Beach · Yaquina Bay</span> <span id="tideDayHint"></span></div>
-      <canvas id="tideChart"></canvas>
-      <div class="tide-list" id="tideList"></div>
-      <div class="tide-swipe-hint" id="tideSwipeHint">swipe or use ‹ › to see up to 14 days</div>
-    </div>
+    <div id="tideMountTab"></div>
     <div class="panel" id="tidepoolPanel"></div>
   </section>
 
@@ -272,7 +324,7 @@ function demoBeach(spotKey){
       {kind:"tidepool",icon:"🦀",title:"Great tidepooling window",detail:"0.4 ft low around 1:02pm — a minus-ish tide, excellent for tidepools and exploring."},
       {kind:"sunset",icon:"🌅",title:"Golden &amp; blue hour",detail:"Golden hour ~7:58pm (warm, low light). Sunset 8:58pm. Then blue hour 8:58pm–9:28pm — the deep-blue afterglow photographers love."}
     ],
-    weather:{nowF:54,feelsF:51,highF:59,rainPct:15,cloudPct:35,foggy:false,windKt:8,gustKt:13,uv:3,uvMax:5,
+    weather:{nowF:54,feelsF:51,highF:59,rainPct:15,cloudPct:35,foggy:false,windKt:8,gustKt:13,windDirDeg:300,uv:3,uvMax:5,
       sunrise:"2026-06-12T05:32",sunset:"2026-06-12T20:58"},
     tides:demoTides(),
     surfHeight:6.2, generated:Date.now() };
@@ -413,76 +465,193 @@ function renderToday(){
   }
 }
 
-/* ---------- render TIDES (14-day, swipeable day by day) ---------- */
-let tideDays=[], tideIdx=0;
+/* ---------- render TIDES: one continuous 14-day wave (Tide Alert style) ---------- */
+let tideDaysArr=[], tidePts=[], tideWired=false, tideCentered=false;
+const TIDE_DAY_W=440, TIDE_CH=260;   // px per day · chart height
+const hmm=iso=>{const m=(iso||"").match(/T?(\d{1,2}):(\d{2})/);return m?(+m[1]*60+ +m[2]):null;};
+const todayKeyPT=()=>new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
+function tideNowMin(){ // "now" as absolute minutes on the 14-day axis
+  const i=tideDaysArr.indexOf(todayKeyPT()); if(i<0)return null;
+  const p=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).match(/(\d{2}):(\d{2})/);
+  return p?i*1440+ +p[1]*60+ +p[2]:null;
+}
+// interpolate tide height at an absolute minute (same cosine easing the curve uses)
+function tideHeightAt(min){
+  for(let i=0;i<tidePts.length-1;i++){
+    const a=tidePts[i],b=tidePts[i+1];
+    if(min>=a.min&&min<=b.min){
+      const f=(min-a.min)/(b.min-a.min||1), e=(1-Math.cos(f*Math.PI))/2;
+      return {h:a.h+(b.h-a.h)*e, rising:b.h>a.h};
+    }
+  }
+  return null;
+}
 
 function renderTides(){
-  const d=beachData; if(!d)return;
-  // group the full 14-day array by day
-  const all=d.tides||[];
-  const byDay={};
-  all.forEach(t=>{ const k=t.day||(t.time||"").slice(0,10); (byDay[k]=byDay[k]||[]).push(t); });
-  tideDays=Object.keys(byDay).sort().map(k=>({day:k,tides:byDay[k]}));
-  // start on today (or first available)
-  const todayKey=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
-  const ti=tideDays.findIndex(x=>x.day===todayKey);
-  tideIdx = ti>=0?ti:0;
-  drawTideDay();
+  const all=(beachData&&beachData.tides)||[]; if(!all.length)return;
+  tideDaysArr=[...new Set(all.map(t=>t.day||(t.time||"").slice(0,10)))].sort();
+  tidePts=all.map(t=>{
+    const day=t.day||(t.time||"").slice(0,10);
+    return {h:t.heightFt,type:t.type,label:fmtTime(t.time),day,
+      min:tideDaysArr.indexOf(day)*1440+(hmm(t.time)??0)};
+  }).sort((a,b)=>a.min-b.min);
+  drawTideWave();
   wireTideNav();
+  updateTideReadout();
   renderTidepools();
+  if(!tideCentered){ tideCentered=true; tideScrollToNow(false); }
 }
 
-function drawTideDay(){
-  const day=tideDays[tideIdx]; if(!day)return;
-  const todayKey=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
-  const dObj=new Date(day.day+"T12:00");
-  const isToday=day.day===todayKey;
-  const label=isToday?"Today":dObj.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"});
-  document.getElementById("tideDate").textContent=label;
-  const dayNum=tideIdx+1;
-  const now=drawTides(day.tides);
-  // explicit "now" readout when viewing today
+function drawTideWave(){
+  const cv=document.getElementById("tideChart"); if(!cv||!tidePts.length)return;
+  const days=tideDaysArr.length, W=days*TIDE_DAY_W, H=TIDE_CH;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  cv.style.width=W+"px"; cv.width=W*dpr; cv.height=H*dpr;
+  const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+  const top=44,bot=H-14;
+  const minH=Math.min(...tidePts.map(p=>p.h))-0.7, maxH=Math.max(...tidePts.map(p=>p.h))+1.0;
+  const X=min=>min/1440*TIDE_DAY_W, Y=h=>bot-(bot-top)*((h-minH)/(maxH-minH));
+
+  // night shading — today's sun times applied across the window (drifts ~1 min/day; fine at this scale)
+  const w=beachData.weather||{};
+  const srM=hmm(w.sunrise)??360, ssM=hmm(w.sunset)??1230;
+  ctx.fillStyle="rgba(0,0,0,0.28)";
+  for(let d=0;d<days;d++){
+    ctx.fillRect(X(d*1440),26,srM/1440*TIDE_DAY_W,bot-26);
+    ctx.fillRect(X(d*1440+ssM),26,(1440-ssM)/1440*TIDE_DAY_W,bot-26);
+  }
+
+  // 0 ft (MLLW) reference when minus tides are in range
+  if(minH<0){
+    const y0=Y(0);
+    ctx.strokeStyle="rgba(233,185,73,0.35)";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(0,y0);ctx.lineTo(W,y0);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="rgba(233,185,73,0.7)";ctx.font="9px 'Spline Sans Mono',monospace";ctx.textAlign="left";
+    ctx.fillText("0 ft",4,y0-4);
+  }
+
+  // day boundaries + labels
+  const tk=todayKeyPT();
+  ctx.font="600 11px 'Spline Sans Mono',monospace";ctx.textAlign="left";
+  tideDaysArr.forEach((day,d)=>{
+    const x=X(d*1440);
+    if(d>0){ctx.strokeStyle="rgba(74,157,143,0.28)";ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(x,26);ctx.lineTo(x,bot);ctx.stroke();}
+    const dObj=new Date(day+"T12:00");
+    const lbl=day===tk?"TODAY":dObj.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+    ctx.fillStyle=day===tk?"#4a9d8f":"#9db4b3";
+    ctx.fillText(lbl,x+8,17);
+  });
+
+  // the wave — one continuous cosine-eased curve through every hi/lo, edge to edge
+  ctx.beginPath();
+  ctx.moveTo(0,Y(tidePts[0].h));
+  ctx.lineTo(X(tidePts[0].min),Y(tidePts[0].h));
+  for(let i=0;i<tidePts.length-1;i++){
+    const a=tidePts[i],b=tidePts[i+1];
+    for(let s=1;s<=24;s++){
+      const f=s/24,e=(1-Math.cos(f*Math.PI))/2;
+      ctx.lineTo(X(a.min+(b.min-a.min)*f),Y(a.h+(b.h-a.h)*e));
+    }
+  }
+  ctx.lineTo(W,Y(tidePts[tidePts.length-1].h));
+  ctx.strokeStyle="#6db5d4";ctx.lineWidth=2.5;ctx.stroke();
+  // water fill under the curve
+  ctx.lineTo(W,bot);ctx.lineTo(0,bot);ctx.closePath();
+  const grad=ctx.createLinearGradient(0,top,0,bot);
+  grad.addColorStop(0,"rgba(109,181,212,0.28)");grad.addColorStop(1,"rgba(109,181,212,0.04)");
+  ctx.fillStyle=grad;ctx.fill();
+
+  // hi/lo markers: height + time at every peak and trough
+  ctx.textAlign="center";
+  tidePts.forEach(p=>{
+    const x=X(p.min),y=Y(p.h),hi=p.type==="high";
+    ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fillStyle=hi?"#6db5d4":"#e9b949";ctx.fill();
+    ctx.fillStyle=hi?"#6db5d4":"#e9b949";ctx.font="600 11px 'Spline Sans Mono',monospace";
+    ctx.fillText(`${p.h.toFixed(1)} ft`,x,hi?y-20:Math.min(bot-4,y+22));
+    ctx.fillStyle="#9db4b3";ctx.font="10px 'Spline Sans Mono',monospace";
+    ctx.fillText(p.label,x,hi?y-8:Math.min(bot+8,y+34));
+  });
+
+  // "you are here" — dashed guide + glowing dot at the current moment
+  const nowA=tideNowMin();
+  if(nowA!=null&&nowA>=tidePts[0].min&&nowA<=tidePts[tidePts.length-1].min){
+    const cur=tideHeightAt(nowA);
+    if(cur){
+      const x=X(nowA),y=Y(cur.h);
+      ctx.strokeStyle="rgba(232,241,239,0.3)";ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(x,26);ctx.lineTo(x,bot);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fillStyle="rgba(74,157,143,0.25)";ctx.fill();
+      ctx.beginPath();ctx.arc(x,y,5.5,0,7);ctx.fillStyle="#4a9d8f";ctx.fill();
+      ctx.strokeStyle="#e8f1ef";ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle="#e8f1ef";ctx.font="600 11px 'Spline Sans Mono',monospace";ctx.textAlign="center";
+      ctx.fillText(`now · ${cur.h.toFixed(1)} ft ${cur.rising?"▲":"▼"}`,x,Math.max(38,y-16));
+    }
+  }
+}
+
+/* header + list follow whatever day is centered in the scroll viewport */
+function tideVisibleDayIdx(){
+  const sc=document.getElementById("tideScroll"); if(!sc)return 0;
+  return Math.max(0,Math.min(tideDaysArr.length-1,
+    Math.floor((sc.scrollLeft+sc.clientWidth/2)/TIDE_DAY_W)));
+}
+function updateTideReadout(){
+  if(!tideDaysArr.length)return;
+  const idx=tideVisibleDayIdx(), day=tideDaysArr[idx], tk=todayKeyPT();
+  const isToday=day===tk;
+  document.getElementById("tideDate").textContent=isToday?"Today":
+    new Date(day+"T12:00").toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"});
   const hint=document.getElementById("tideDayHint");
-  if(isToday && now && now.nowH!=null){
-    hint.innerHTML=`<span style="color:var(--kelp);font-weight:600;">now ${now.nowH.toFixed(1)} ft ${now.rising?"&#9650; rising":"&#9660; falling"}</span> · day ${dayNum} of ${tideDays.length}`;
-  } else {
-    hint.textContent=`day ${dayNum} of ${tideDays.length}`;
-  }
-  document.getElementById("tideList").innerHTML=day.tides.map(t=>`
-    <div class="ti ${t.type}"><span class="ty">${t.type}</span><span class="hv">${t.heightFt.toFixed(1)} ft</span><span style="color:var(--foam-dim)">${fmtTime(t.time)}</span></div>`).join("");
-  // arrow enable/disable
-  const prev=document.getElementById("tidePrev"), next=document.getElementById("tideNext");
-  if(prev)prev.disabled=tideIdx<=0;
-  if(next)next.disabled=tideIdx>=tideDays.length-1;
+  const cur=isToday?tideHeightAt(tideNowMin()??-1):null;
+  hint.innerHTML=(cur?`<span style="color:var(--kelp);font-weight:600;">now ${cur.h.toFixed(1)} ft ${cur.rising?"&#9650; rising":"&#9660; falling"}</span> · `:"")+
+    `day ${idx+1} of ${tideDaysArr.length}`;
+  document.getElementById("tideList").innerHTML=tidePts.filter(p=>p.day===day).map(t=>`
+    <div class="ti ${t.type}"><span class="ty">${t.type}</span><span class="hv">${t.h.toFixed(1)} ft</span><span style="color:var(--foam-dim)">${t.label}</span></div>`).join("");
+  const prev=document.getElementById("tidePrev"), next=document.getElementById("tideNext"), sc=document.getElementById("tideScroll");
+  if(prev)prev.disabled=sc?sc.scrollLeft<=2:idx<=0;
+  if(next)next.disabled=sc?sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2:idx>=tideDaysArr.length-1;
+}
+function tideScrollToNow(smooth){
+  const sc=document.getElementById("tideScroll"), nowA=tideNowMin();
+  if(!sc||nowA==null)return;
+  sc.scrollTo({left:Math.max(0,nowA/1440*TIDE_DAY_W-sc.clientWidth*0.3),behavior:smooth?"smooth":"auto"});
 }
 
-let tideNavWired=false;
 function wireTideNav(){
-  if(tideNavWired)return; tideNavWired=true;
-  const prev=document.getElementById("tidePrev"), next=document.getElementById("tideNext"), cv=document.getElementById("tideChart");
-  const go=delta=>{ const n=tideIdx+delta; if(n>=0&&n<tideDays.length){ tideIdx=n; drawTideDay(); } };
-  if(prev)prev.onclick=()=>go(-1);
-  if(next)next.onclick=()=>go(1);
-  // swipe on the chart
-  if(cv){
-    let x0=null;
-    cv.addEventListener("touchstart",e=>{ x0=e.touches[0].clientX; },{passive:true});
-    cv.addEventListener("touchend",e=>{ if(x0==null)return; const dx=e.changedTouches[0].clientX-x0;
-      if(Math.abs(dx)>40) go(dx<0?1:-1); x0=null; },{passive:true});
-    // also allow click-drag on desktop
-    let mx=null;
-    cv.addEventListener("mousedown",e=>{ mx=e.clientX; });
-    window.addEventListener("mouseup",e=>{ if(mx==null)return; const dx=e.clientX-mx; if(Math.abs(dx)>50) go(dx<0?1:-1); mx=null; });
-  }
-  // keyboard arrows when tides tab is active
-  document.addEventListener("keydown",e=>{ if(activeView!=="tides")return;
-    if(e.key==="ArrowLeft")go(-1); else if(e.key==="ArrowRight")go(1); });
-  // live: nudge the "now" dot along every 3 min while viewing today's tides
-  setInterval(()=>{
-    if(activeView!=="tides"||!tideDays.length)return;
-    const todayKey=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
-    if(tideDays[tideIdx]&&tideDays[tideIdx].day===todayKey) drawTideDay();
-  },180000);
+  if(tideWired)return; tideWired=true;
+  const sc=document.getElementById("tideScroll");
+  const prev=document.getElementById("tidePrev"), next=document.getElementById("tideNext");
+  if(prev)prev.onclick=()=>sc.scrollBy({left:-TIDE_DAY_W,behavior:"smooth"});
+  if(next)next.onclick=()=>sc.scrollBy({left:TIDE_DAY_W,behavior:"smooth"});
+  // header/list track the scroll (rAF-throttled)
+  let raf=null;
+  sc.addEventListener("scroll",()=>{ if(raf)return; raf=requestAnimationFrame(()=>{raf=null;updateTideReadout();}); },{passive:true});
+  // desktop drag-to-scroll (touch scrolls natively)
+  let dragX=null,dragL=0;
+  sc.addEventListener("mousedown",e=>{dragX=e.clientX;dragL=sc.scrollLeft;e.preventDefault();});
+  window.addEventListener("mousemove",e=>{if(dragX!=null)sc.scrollLeft=dragL-(e.clientX-dragX);});
+  window.addEventListener("mouseup",()=>{dragX=null;});
+  // keyboard ‹ › on the today/tides views
+  document.addEventListener("keydown",e=>{
+    if(activeView!=="tides"&&activeView!=="today")return;
+    if(/^(input|select|textarea)$/i.test(e.target.tagName))return;
+    if(e.key==="ArrowLeft")sc.scrollBy({left:-TIDE_DAY_W,behavior:"smooth"});
+    else if(e.key==="ArrowRight")sc.scrollBy({left:TIDE_DAY_W,behavior:"smooth"});
+  });
+  // keep the "now" dot drifting along every 3 min
+  setInterval(()=>{ if(tidePts.length){drawTideWave();updateTideReadout();} },180000);
+}
+
+/* the tide panel lives on Today, and moves into the Tides tab when that's active.
+   `keep` is the scroll position captured BEFORE the old view was hidden
+   (display:none zeroes scrollLeft, so it must be read early). */
+function mountTidePanel(view, keep){
+  const panel=document.getElementById("tidePanel"); if(!panel)return;
+  const target=document.getElementById(view==="tides"?"tideMountTab":"tideMountToday");
+  const sc=document.getElementById("tideScroll");
+  if(target&&panel.parentElement!==target) target.appendChild(panel);
+  if(sc&&keep!=null&&keep>0) sc.scrollLeft=keep;
 }
 
 function renderTidepools(){
@@ -526,78 +695,62 @@ function renderSky(){
     </div>`;
 }
 
-/* tide chart — time-based X axis, with a "you are here" dot when viewing today */
-function drawTides(tides){
-  const cv=document.getElementById("tideChart");if(!cv)return;
-  const dpr=window.devicePixelRatio||1,W=cv.clientWidth||600,H=150;
-  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
-  if(!tides||!tides.length)return;
+/* ---------- render WIND (shared design language with the Surf Report) ---------- */
+const dirName=d=>{if(d==null)return"—";const n=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];return n[Math.round(d/22.5)%16];};
 
-  // map each tide point to minutes-from-midnight (its real clock time)
-  const mm=t=>{const m=(t.time||"").match(/(\d{1,2}):(\d{2})/);return m?(+m[1]*60+ +m[2]):0;};
-  const pts=tides.map(t=>({h:t.heightFt,type:t.type,label:fmtTime(t.time),min:mm(t)}));
-  // span the full day (0–1440) so the X axis is real time, not point index
-  const pad=26,top=18,bot=H-26;
-  const minH=Math.min(...pts.map(p=>p.h))-0.5,maxH=Math.max(...pts.map(p=>p.h))+0.5;
-  const X=min=>pad+(W-2*pad)*(min/1440);
-  const Y=h=>bot-(bot-top)*((h-minH)/(maxH-minH));
-
-  // smooth cosine curve between consecutive hi/lo points, positioned by real time
-  ctx.beginPath();
-  let started=false;
-  for(let i=0;i<pts.length-1;i++){
-    const a=pts[i],b=pts[i+1];
-    for(let s=0;s<=24;s++){
-      const f=s/24, e=(1-Math.cos(f*Math.PI))/2;
-      const min=a.min+(b.min-a.min)*f, h=a.h+(b.h-a.h)*e;
-      const x=X(min),y=Y(h);
-      started?ctx.lineTo(x,y):(ctx.moveTo(x,y),started=true);
-    }
+/* compass dial: ring + cardinal marks + arrow showing the way the wind blows TO */
+function compassSVG(dir, cls){
+  const color = cls==="off"?"#e9b949":cls==="on"?"#e36f5c":cls==="calm"?"#4a9d8f":"#6db5d4";
+  if(dir==null){
+    return `<svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" fill="none" stroke="rgba(160,190,190,0.2)" stroke-width="2"/>
+      <text x="35" y="39" fill="#9db4b3" font-size="9" text-anchor="middle" font-family="monospace">calm</text></svg>`;
   }
-  ctx.strokeStyle="#6db5d4";ctx.lineWidth=2;ctx.stroke();
-  // fill under the curve down to the baseline
-  ctx.lineTo(X(pts[pts.length-1].min),bot);ctx.lineTo(X(pts[0].min),bot);ctx.closePath();
-  ctx.fillStyle="rgba(109,181,212,0.12)";ctx.fill();
+  // wind FROM dir => blows TO (dir+180). Arrow points the way it travels.
+  const to=(dir+180)%360, rad=(to-90)*Math.PI/180, cx=35, cy=35, len=21;
+  const tx=cx+Math.cos(rad)*len, ty=cy+Math.sin(rad)*len;
+  const bx=cx-Math.cos(rad)*len, by=cy-Math.sin(rad)*len;
+  return `<svg viewBox="0 0 70 70">
+    <circle cx="35" cy="35" r="30" fill="rgba(15,32,39,0.4)" stroke="rgba(160,190,190,0.2)" stroke-width="2"/>
+    <text x="35" y="11" fill="#9db4b3" font-size="8" text-anchor="middle" font-family="monospace">N</text>
+    <text x="35" y="65" fill="#9db4b3" font-size="8" text-anchor="middle" font-family="monospace">S</text>
+    <text x="62" y="38" fill="#9db4b3" font-size="8" text-anchor="middle" font-family="monospace">E</text>
+    <text x="8" y="38" fill="#9db4b3" font-size="8" text-anchor="middle" font-family="monospace">W</text>
+    <line x1="${bx}" y1="${by}" x2="${tx}" y2="${ty}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="${tx},${ty} ${tx-Math.cos(rad-0.45)*8},${ty-Math.sin(rad-0.45)*8} ${tx-Math.cos(rad+0.45)*8},${ty-Math.sin(rad+0.45)*8}" fill="${color}"/>
+    <circle cx="${bx}" cy="${by}" r="2.5" fill="${color}"/>
+  </svg>`;
+}
 
-  // hi/lo markers + labels
-  pts.forEach(p=>{const x=X(p.min),y=Y(p.h);ctx.beginPath();ctx.arc(x,y,3.5,0,7);ctx.fillStyle=p.type==="high"?"#6db5d4":"#e9b949";ctx.fill();
-    ctx.fillStyle="#9db4b3";ctx.font="9px 'Spline Sans Mono',monospace";ctx.textAlign="center";ctx.fillText(p.label,x,bot+15);});
-
-  // ---- "you are here" marker: only when the viewed day IS today ----
-  const todayKey=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
-  const viewedDay=(tides[0]&&(tides[0].day||(tides[0].time||"").slice(0,10)))||"";
-  if(viewedDay===todayKey){
-    const nowM=(()=>{const p=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).match(/(\d{2}):(\d{2})/);return p?(+p[1]*60+ +p[2]):null;})();
-    if(nowM!=null && nowM>=pts[0].min && nowM<=pts[pts.length-1].min){
-      // interpolate height at current time along the same cosine segments
-      let nowH=null, rising=null;
-      for(let i=0;i<pts.length-1;i++){
-        if(nowM>=pts[i].min && nowM<=pts[i+1].min){
-          const f=(nowM-pts[i].min)/(pts[i+1].min-pts[i].min);
-          const e=(1-Math.cos(f*Math.PI))/2;
-          nowH=pts[i].h+(pts[i+1].h-pts[i].h)*e;
-          rising=pts[i+1].h>pts[i].h;
-          break;
-        }
-      }
-      if(nowH!=null){
-        const x=X(nowM),y=Y(nowH);
-        // vertical guide line
-        ctx.strokeStyle="rgba(232,241,239,0.25)";ctx.lineWidth=1;ctx.setLineDash([3,3]);
-        ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bot);ctx.stroke();ctx.setLineDash([]);
-        // big glowing "now" dot
-        ctx.beginPath();ctx.arc(x,y,8,0,7);ctx.fillStyle="rgba(74,157,143,0.25)";ctx.fill();
-        ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fillStyle="#4a9d8f";ctx.fill();
-        ctx.strokeStyle="#e8f1ef";ctx.lineWidth=2;ctx.stroke();
-        // label: height + rising/falling
-        ctx.fillStyle="#e8f1ef";ctx.font="600 10px 'Spline Sans Mono',monospace";ctx.textAlign="center";
-        const tag=`${nowH.toFixed(1)}ft ${rising?"▲ rising":"▼ falling"}`;
-        const lx=Math.max(pad+30,Math.min(W-pad-30,x));
-        ctx.fillText(tag, lx, Math.max(top+8, y-14));
-        return {nowH,rising};
-      }
-    }
+/* wind read for BEACH-GOERS: comfort, sand, kites — not wave grooming */
+function renderWind(){
+  const el=document.getElementById("windMount"); if(!el)return;
+  const w=(beachData&&beachData.weather)||null;
+  if(!w||w.windKt==null){ el.innerHTML=""; return; }
+  const kt=w.windKt, gust=w.gustKt, dir=w.windDirDeg;
+  let cls="cr", word="Cross-shore", why="running along the beach — you'll feel it walking one direction and not the other";
+  if(kt<5){ cls="calm"; word="Calm"; why="barely a breeze — easy day for umbrellas, blankets, and little kids"; }
+  else if(dir!=null){
+    // relative to a generally W-facing beach: offshore = easterly
+    const off=Math.min(Math.abs(dir-90),360-Math.abs(dir-90));
+    if(off<55){ cls="off"; word="Offshore";
+      why="blowing from the land out to sea — the sand feels calmer and the surf looks clean and groomed. Keep a hand on floats and toys, they drift out"; }
+    else if(off>115){ cls="on"; word="Onshore";
+      why=kt>=15?"driving in hard off the ocean — expect wind-chill and blowing sand. Bring layers and find a windbreak or a sheltered cove"
+                :"a fresh sea breeze in off the water — totally fine with a layer on"; }
   }
+  const kite = kt>=8&&kt<=20 ? " 🪁 Great kite-flying wind." : "";
+  const col = cls==="off"?"var(--gold)":cls==="on"?"var(--coral)":cls==="calm"?"var(--kelp)":"var(--sky)";
+  el.innerHTML=`<div class="panel"><div class="wind-row">
+      <div class="dial">${compassSVG(dir,cls)}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="wr-main">
+          <span class="wr-kt" style="color:${col};">${ktMph(kt)} mph</span>
+          <span class="wr-sub">(${Math.round(kt)} kt)${gust!=null?` · gusts ${Math.round(gust*1.151)} mph`:""}${dir!=null?` · from the ${dirName(dir)}`:""}</span>
+          <span class="wr-tag" style="color:${col};">WIND</span>
+        </div>
+        <div class="wr-why"><b style="color:${col};">${word}</b> — ${why}.${kite}</div>
+      </div>
+    </div></div>`;
 }
 function addMin(iso,delta){const m=(iso||"").match(/T?(\d{1,2}):(\d{2})/);if(!m)return iso;let tot=+m[1]*60+ +m[2]+delta;tot=(tot+1440)%1440;const h=Math.floor(tot/60),mm=tot%60;return `${String(h).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;}
 
@@ -617,9 +770,14 @@ function renderSurf(){
 /* ---------- tabs + spot ---------- */
 function switchView(v){
   activeView=v;
+  const sc=document.getElementById("tideScroll");
+  const keepScroll=sc?sc.scrollLeft:0;   // capture before views hide
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.view===v));
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("on",s.id==="view-"+v));
-  if(v==="tides")renderTides(); else if(v==="surf")renderSurf(); else if(v==="sky")renderSky(); else renderToday();
+  if(v==="tides"){ mountTidePanel("tides", keepScroll); renderTides(); }
+  else if(v==="surf")renderSurf();
+  else if(v==="sky")renderSky();
+  else { mountTidePanel("today", keepScroll); renderToday(); renderWind(); renderTides(); }
 }
 
 function buildSpotSel(spots){
@@ -643,7 +801,7 @@ async function load(){
     `${beachData.demo?'<div class="demo-banner">⚠ Demo data — deploy beach-worker.js to functions/api/beach.js for live conditions.</div>':""}`+
     `Safety alerts: National Weather Service (zone ORZ001). Weather &amp; sun: Open-Meteo. Tides: NOAA station 9435380. Surf: NDBC buoy 46050.<br>
      Official NWS advisories always take priority over this tool's own readings. Conditions change fast — <b>always watch the ocean before you go near it.</b> In emergencies call 911.`;
-  window.addEventListener("resize",()=>{ if(beachData&&activeView==="tides"&&tideDays.length)drawTideDay(); },{passive:true});
+  window.addEventListener("resize",()=>{ if(tideDaysArr.length)updateTideReadout(); },{passive:true});
 }
 
 document.getElementById("tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)switchView(b.dataset.view);});
