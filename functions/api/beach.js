@@ -26,17 +26,53 @@ const NWS_UA   = "BeachReport/1.0 (beach.jburkephotos.com; jlburkephotos@gmail.c
 // structural (headlands, jetties channeling water) and present almost always.
 // This is local ground-truth the NWS general forecast can't give. Edit freely.
 const KNOWN_RIPS = {
-  "south-beach": [{
-    name:"South Jetty rip",
+  "seaside-cove": [{
+    name:"Tillamook Head rip — The Cove",
     severity:"high",
-    text:"A strong, near-constant rip runs along the south jetty at the mouth of Yaquina Bay. It's fast and pulls straight out. Stay well south of the jetty, keep kids back, and never wade near the rocks. If caught: don't fight it — swim parallel to the beach, then back in."
+    text:"Water pushed against the base of Tillamook Head funnels back out along the rocks at the south end of the Cove. The pull is strongest near the rocky edge and doesn't look like much from shore. Stay off the rocks, keep toward the middle of the beach, and if caught, swim parallel to shore before heading in."
+  }],
+  "short-sand": [{
+    name:"Creek-mouth rip, mid-beach",
+    severity:"high",
+    text:"Necarney Creek drains across the middle of Short Sand and its outflow digs a rip channel straight off the beach — strongest on a dropping tide. The smooth, darker, calm-looking lane in the middle of the surf IS the rip. Swimmers and kids should stay clear of the creek channel; if caught, swim parallel to the beach, then in."
+  }],
+  "pacific-city": [{
+    name:"Cape Kiwanda rip — and the cape itself",
+    severity:"high",
+    text:"A rip runs along the south flank of Cape Kiwanda where wave water drains back off the rock. The cape itself is the bigger killer here: sneaker waves sweep people off the bare sandstone every year. Stay behind the fence lines, off the wet rock, and out of the water tight against the cape."
+  }],
+  "otter-rock": [{
+    name:"Devil's Punchbowl channels",
+    severity:"high",
+    text:"Rips run along the rocky reef edges on both sides of this cove, feeding the channels around the Punchbowl. The middle of the beach breaks evenly — stay there. Keep clear of the rock edges at anything but a full low tide, and mind the incoming tide cutting off the Punchbowl floor."
   }],
   "agate-beach": [{
     name:"Yaquina Head rip",
     severity:"high",
     text:"The rocky point at Yaquina Head channels a fast rip along its south side. It's deceptive on calm-looking days. Keep clear of the rocks, stay where the waves break evenly, and if pulled out, swim parallel to shore before heading in."
   }],
-  // Add more as you map them — river mouths, other jetties, etc.
+  "south-beach": [{
+    name:"South Jetty rip",
+    severity:"high",
+    text:"A strong, near-constant rip runs along the south jetty at the mouth of Yaquina Bay. It's fast and pulls straight out. Stay well south of the jetty, keep kids back, and never wade near the rocks. If caught: don't fight it — swim parallel to the beach, then back in."
+  }],
+  "florence": [{
+    name:"Siuslaw South Jetty rip",
+    severity:"high",
+    text:"Same story as every Oregon jetty: outgoing water runs along the south jetty of the Siuslaw in a fast, near-permanent rip, worst on an ebbing tide. Give the jetty a wide berth, don't wade near the rocks, and if caught, swim parallel to the beach before turning in."
+  }],
+  "bastendorff": [{
+    name:"Coos Bay South Jetty rip",
+    severity:"high",
+    text:"Bastendorff sits right against the south jetty of the Coos Bay bar, and a strong rip runs the jetty line — fed by the bar's outgoing current, it's fastest on the ebb. Stay well down the beach from the jetty, and treat the surf near the bar mouth as no-swim water."
+  }],
+  "port-orford": [{
+    name:"Battle Rock currents",
+    severity:"high",
+    text:"Currents wrap and funnel around Battle Rock and the Heads, and the water off the rock drops away quickly. The beach looks sheltered — the water isn't. Keep swimmers away from the rock's edges and channels, and if pulled out, swim parallel to shore before heading in."
+  }],
+  // Hand-curated local ground-truth. Edit freely as you map more —
+  // river mouths, seasonal holes, etc.
 };
 
 // Each spot carries its own data sources, verified live 2026-07-05:
