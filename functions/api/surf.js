@@ -12,20 +12,18 @@
  * (Standalone Worker also works; see entry points below.)
  */
 
-const BUOY = "46050";            // Stonewall Bank — central OR offshore reference
-const TIDE_STATION = "9435380";  // South Beach, Yaquina Bay (Newport)
-
-// Per-spot coordinates feed Open-Meteo's nearshore forecast.
+// Per-spot coordinates feed Open-Meteo's nearshore forecast; each spot also
+// carries its nearest NOAA tide station + NDBC buoy (verified live 2026-07-05).
 const SPOTS = {
-  "seaside-cove":   { name:"Seaside Cove",             lat:45.98, lon:-123.94 },
-  "short-sand":     { name:"Short Sand (Oswald West)", lat:45.76, lon:-123.96 },
-  "pacific-city":   { name:"Pacific City",             lat:45.20, lon:-123.97 },
-  "otter-rock":     { name:"Otter Rock",               lat:44.75, lon:-124.07 },
-  "agate-beach":    { name:"Agate Beach",              lat:44.66, lon:-124.06 },
-  "south-beach":    { name:"South Beach",              lat:44.61, lon:-124.07 },
-  "florence":       { name:"Florence (S Jetty)",       lat:43.98, lon:-124.13 },
-  "bastendorff":    { name:"Bastendorff Beach",        lat:43.34, lon:-124.34 },
-  "port-orford":    { name:"Battle Rock (Port Orford)",lat:42.74, lon:-124.50 },
+  "seaside-cove":   { name:"Seaside Cove",             lat:45.98, lon:-123.94, tide:"9439011", tideName:"Hammond · Columbia Mouth",      buoy:"46029" },
+  "short-sand":     { name:"Short Sand (Oswald West)", lat:45.76, lon:-123.96, tide:"9437585", tideName:"North Jetty · Tillamook Bay",   buoy:"46029" },
+  "pacific-city":   { name:"Pacific City",             lat:45.20, lon:-123.97, tide:"9436381", tideName:"Cascade Head · Salmon River",   buoy:"46029" },
+  "otter-rock":     { name:"Otter Rock",               lat:44.75, lon:-124.07, tide:"9435827", tideName:"Depoe Bay",                     buoy:"46050" },
+  "agate-beach":    { name:"Agate Beach",              lat:44.66, lon:-124.06, tide:"9435380", tideName:"South Beach · Yaquina Bay",     buoy:"46050" },
+  "south-beach":    { name:"South Beach",              lat:44.61, lon:-124.07, tide:"9435380", tideName:"South Beach · Yaquina Bay",     buoy:"46050" },
+  "florence":       { name:"Florence (S Jetty)",       lat:43.98, lon:-124.13, tide:"9434132", tideName:"Siuslaw River Entrance",        buoy:"46050" },
+  "bastendorff":    { name:"Bastendorff Beach",        lat:43.34, lon:-124.34, tide:"9432780", tideName:"Charleston · Coos Bay",         buoy:"46015" },
+  "port-orford":    { name:"Battle Rock (Port Orford)",lat:42.74, lon:-124.50, tide:"9431647", tideName:"Port Orford",                   buoy:"46015" },
 };
 
 // ----------------------------------------------------------------------------
@@ -80,8 +78,8 @@ async function handle(request) {
   try {
     const [forecast, buoy, tides] = await Promise.all([
       getForecast(spot, marineDays, days, windOnly),
-      getBuoy().catch(() => null),
-      getTides().catch(() => null),
+      getBuoy(spot.buoy).catch(() => null),
+      getTides(spot.tide).catch(() => null),
     ]);
     return new Response(JSON.stringify({
       spot: { key: spotKey, name: spot.name, lat: spot.lat, lon: spot.lon },
@@ -89,6 +87,8 @@ async function handle(request) {
       days, windOnly,
       tuning: SPOT_TUNING[spotKey] || null,
       spotFit: spotFitRead(spotKey, forecast[0]),
+      tideStation: { id: spot.tide, name: spot.tideName },
+      buoyId: spot.buoy,
       forecast, buoy, tides, generated: Date.now(),
     }), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
@@ -166,8 +166,8 @@ async function getForecast(spot, marineDays, reqDays, windOnly) {
 }
 
 // ---------- NDBC buoy: live "right now" ----------
-async function getBuoy() {
-  const r = await fetch(`https://www.ndbc.noaa.gov/data/realtime2/${BUOY}.txt`, { cf: { cacheTtl: 900 } });
+async function getBuoy(buoy) {
+  const r = await fetch(`https://www.ndbc.noaa.gov/data/realtime2/${buoy}.txt`, { cf: { cacheTtl: 900 } });
   if (!r.ok) throw new Error(`buoy ${r.status}`);
   const txt = await r.text();
   for (const line of txt.split("\n").filter(l => l && !l.startsWith("#"))) {
@@ -190,10 +190,10 @@ async function getBuoy() {
 }
 
 // ---------- NOAA tides ----------
-async function getTides() {
+async function getTides(station) {
   const base = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter";
   const q = new URLSearchParams({
-    station: TIDE_STATION, product: "predictions", datum: "MLLW", interval: "hilo",
+    station, product: "predictions", datum: "MLLW", interval: "hilo",
     units: "english", time_zone: "lst_ldt", format: "json", date: "today", range: "48",
     application: "SwellReader",
   });

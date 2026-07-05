@@ -173,7 +173,7 @@
       <div id="swellNow"></div>
     </div>
     <div class="panel" id="tidePanel">
-      <h3>Tide <span class="tag">South Beach · Yaquina Bay</span></h3>
+      <h3>Tide <span class="tag" id="tideStationTag">nearest NOAA station</span></h3>
       <canvas id="tideChart"></canvas>
       <div class="tide-list" id="tideList"></div>
     </div>
@@ -434,6 +434,8 @@ function render(){
       </div>`:""}
     </div>`;
 
+  const tsTag=document.getElementById("tideStationTag");
+  if(tsTag&&d.tideStation)tsTag.textContent=d.tideStation.name;
   drawTides(d.tides);
   document.getElementById("tideList").innerHTML=(d.tides||[]).slice(0,4).map(t=>`
     <div class="ti ${t.type}"><span class="ty">${t.type}</span><span class="hv">${t.heightFt.toFixed(1)} ft</span><span style="color:var(--foam-dim)">${t.time.split(" ")[1]||t.time}</span></div>`).join("");

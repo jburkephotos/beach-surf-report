@@ -4,7 +4,7 @@
  * Powers the "Should I go to the beach today?" view for VISITORS, not just
  * surfers. Pulls everything server-side (no CORS), no API keys:
  *
- *   1) NWS OFFICIAL ALERTS  — api.weather.gov, zone ORZ001 (Central OR Coast:
+ *   1) NWS OFFICIAL ALERTS  — api.weather.gov, per-spot land zone (see SPOTS:
  *      Lincoln City, Newport, Waldport). Real Beach Hazards Statements, High
  *      Surf Advisories, Tsunami alerts. THIS IS THE AUTHORITATIVE SAFETY SOURCE.
  *   2) DAYLIGHT WEATHER     — Open-Meteo: temp, rain chance, cloud/fog, UV, wind.
@@ -20,11 +20,7 @@
  * Set it below (NWS asks for a contact). Without it, requests may be rejected.
  */
 
-const NWS_ZONE = "ORZ001";                 // Central Coast of Oregon (land zone, for alerts)
-const NWS_SURF_ZONE = "orz103";            // Lincoln City surf-zone forecast (rip current risk)
 const NWS_UA   = "BeachReport/1.0 (beach.jburkephotos.com; jlburkephotos@gmail.com)";
-const TIDE_STATION = "9435380";            // South Beach, Yaquina Bay (Newport)
-const BUOY = "46050";
 
 // HAND-BUILT known permanent rip hazards. These aren't weather — they're
 // structural (headlands, jetties channeling water) and present almost always.
@@ -43,16 +39,31 @@ const KNOWN_RIPS = {
   // Add more as you map them — river mouths, other jetties, etc.
 };
 
+// Each spot carries its own data sources, verified live 2026-07-05:
+//   tide     — nearest open-water NOAA tide station (predictions confirmed)
+//   tideName — label shown over the tide chart
+//   zone     — NWS land forecast zone for alerts (from api.weather.gov/points)
+//   surfZone — NWS surf-zone product for rip current risk (tgftp file confirmed)
+//   buoy     — nearest live NDBC buoy (46029 Columbia, 46050 Stonewall, 46015 Port Orford)
 const SPOTS = {
-  "seaside-cove":{name:"Seaside Cove",lat:45.98,lon:-123.94},
-  "short-sand":{name:"Short Sand",lat:45.76,lon:-123.96},
-  "pacific-city":{name:"Pacific City",lat:45.20,lon:-123.97},
-  "otter-rock":{name:"Otter Rock",lat:44.75,lon:-124.07},
-  "agate-beach":{name:"Agate Beach",lat:44.66,lon:-124.06},
-  "south-beach":{name:"South Beach",lat:44.61,lon:-124.07},
-  "florence":{name:"Florence",lat:43.98,lon:-124.13},
-  "bastendorff":{name:"Bastendorff",lat:43.34,lon:-124.34},
-  "port-orford":{name:"Port Orford",lat:42.74,lon:-124.50},
+  "seaside-cove":{name:"Seaside Cove",lat:45.98,lon:-123.94,
+    tide:"9439011",tideName:"Hammond · Columbia Mouth",zone:"ORZ101",surfZone:"orz101",buoy:"46029"},
+  "short-sand":{name:"Short Sand",lat:45.76,lon:-123.96,
+    tide:"9437585",tideName:"North Jetty · Tillamook Bay",zone:"ORZ102",surfZone:"orz102",buoy:"46029"},
+  "pacific-city":{name:"Pacific City",lat:45.20,lon:-123.97,
+    tide:"9436381",tideName:"Cascade Head · Salmon River",zone:"ORZ102",surfZone:"orz102",buoy:"46029"},
+  "otter-rock":{name:"Otter Rock",lat:44.75,lon:-124.07,
+    tide:"9435827",tideName:"Depoe Bay",zone:"ORZ103",surfZone:"orz103",buoy:"46050"},
+  "agate-beach":{name:"Agate Beach",lat:44.66,lon:-124.06,
+    tide:"9435380",tideName:"South Beach · Yaquina Bay",zone:"ORZ103",surfZone:"orz103",buoy:"46050"},
+  "south-beach":{name:"South Beach",lat:44.61,lon:-124.07,
+    tide:"9435380",tideName:"South Beach · Yaquina Bay",zone:"ORZ103",surfZone:"orz103",buoy:"46050"},
+  "florence":{name:"Florence",lat:43.98,lon:-124.13,
+    tide:"9434132",tideName:"Siuslaw River Entrance",zone:"ORZ103",surfZone:"orz103",buoy:"46050"},
+  "bastendorff":{name:"Bastendorff",lat:43.34,lon:-124.34,
+    tide:"9432780",tideName:"Charleston · Coos Bay",zone:"ORZ021",surfZone:"orz021",buoy:"46015"},
+  "port-orford":{name:"Port Orford",lat:42.74,lon:-124.50,
+    tide:"9431647",tideName:"Port Orford",zone:"ORZ021",surfZone:"orz021",buoy:"46015"},
 };
 
 export async function onRequest(context){ return handle(context.request); }
@@ -71,13 +82,14 @@ async function handle(request){
   const spot=SPOTS[spotKey]||SPOTS["south-beach"];
 
   try{
-    const [alerts, weather, tides, surf, ripFc] = await Promise.all([
-      getAlerts().catch(()=>[]),
+    const [alerts, wx, tides, surf, ripFc] = await Promise.all([
+      getAlerts(spot.zone).catch(()=>[]),
       getWeather(spot).catch(()=>null),
-      getTides().catch(()=>null),
-      getBuoyHeight().catch(()=>null),
-      getSurfZone().catch(()=>null),
+      getTides(spot.tide).catch(()=>null),
+      getBuoyHeight(spot.buoy).catch(()=>null),
+      getSurfZone(spot.surfZone).catch(()=>null),
     ]);
+    const weather = wx?wx.now:null, daily = wx?wx.daily:null;
 
     // builders that reason about "today" get today's tides only;
     // the full 14-day array still goes out for the swipeable chart.
@@ -96,7 +108,9 @@ async function handle(request){
       spot:{key:spotKey,name:spot.name},
       spots:Object.entries(SPOTS).map(([k,v])=>({key:k,name:v.name})),
       safety, beachDay, moments, rip, bestWindow, campfire, photo,
-      weather, tides, tidesToday, surfHeight:surf,
+      weather, daily, tides, tidesToday, surfHeight:surf,
+      tideStation:{id:spot.tide,name:spot.tideName},
+      sources:{zone:spot.zone,surfZone:spot.surfZone,buoy:spot.buoy},
       generated:Date.now(),
     }),{headers:{...cors,"Content-Type":"application/json"}});
   }catch(e){
@@ -105,8 +119,8 @@ async function handle(request){
 }
 
 // ---------- 1. NWS official alerts ----------
-async function getAlerts(){
-  const r=await fetch(`https://api.weather.gov/alerts/active/zone/${NWS_ZONE}`,
+async function getAlerts(zone){
+  const r=await fetch(`https://api.weather.gov/alerts/active/zone/${zone}`,
     { headers:{ "User-Agent":NWS_UA, "Accept":"application/geo+json" }, cf:{cacheTtl:600} });
   if(!r.ok) throw new Error(`nws ${r.status}`);
   const d=await r.json();
@@ -124,12 +138,14 @@ async function getAlerts(){
   });
 }
 
-// ---------- 2. daylight weather ----------
+// ---------- 2. weather: current conditions + a 14-day daily planner ----------
 async function getWeather(spot){
+  // hourly only needs today (current-hour read); daily runs the full 14-day
+  // window so the planner lines up with the tide chart
   const u=`https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}`+
     `&hourly=temperature_2m,apparent_temperature,precipitation_probability,cloud_cover,visibility,wind_speed_10m,wind_gusts_10m,wind_direction_10m,uv_index`+
-    `&daily=sunrise,sunset,uv_index_max,precipitation_probability_max,temperature_2m_max`+
-    `&timezone=America%2FLos_Angeles&forecast_days=1&temperature_unit=fahrenheit&wind_speed_unit=kn`;
+    `&daily=sunrise,sunset,uv_index_max,precipitation_probability_max,temperature_2m_max,wind_speed_10m_max,cloud_cover_mean,weather_code`+
+    `&timezone=America%2FLos_Angeles&forecast_days=14&temperature_unit=fahrenheit&wind_speed_unit=kn`;
   const r=await fetch(u,{cf:{cacheTtl:900}});
   if(!r.ok) throw new Error(`weather ${r.status}`);
   const d=await r.json();
@@ -138,7 +154,7 @@ async function getWeather(spot){
   const nowIso=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,13);
   let i=(H.time||[]).findIndex(t=>t.slice(0,13)>=nowIso); if(i<0)i=0;
   const vis=H.visibility?.[i];
-  return {
+  const now={
     nowF: r1(H.temperature_2m?.[i]),
     feelsF: r1(H.apparent_temperature?.[i]),
     highF: r1(D.temperature_2m_max?.[0]),
@@ -154,16 +170,33 @@ async function getWeather(spot){
     sunrise: D.sunrise?.[0]||null,
     sunset: D.sunset?.[0]||null,
   };
+  // per-day planner rows, scored with the same grading as the beach-day verdict
+  const daily=(D.time||[]).map((day,k)=>{
+    const row={
+      day,
+      highF: r1(D.temperature_2m_max?.[k]),
+      rainPct: D.precipitation_probability_max?.[k] ?? null,
+      cloudPct: D.cloud_cover_mean?.[k] ?? null,
+      windKt: r1(D.wind_speed_10m_max?.[k]),
+      code: D.weather_code?.[k] ?? null,
+      sunrise: D.sunrise?.[k]||null,
+      sunset: D.sunset?.[k]||null,
+    };
+    const bd=buildBeachDay({highF:row.highF,rainPct:row.rainPct,windKt:row.windKt,cloudPct:row.cloudPct,foggy:false});
+    row.score=bd?bd.score:null; row.max=bd?bd.max:7;
+    return row;
+  });
+  return {now, daily};
 }
 
 // ---------- 3+4. tides ----------
-async function getTides(){
+async function getTides(station){
   // 14-day window of high/low predictions (NOAA allows up to 10 years out)
   const pad=n=>String(n).padStart(2,"0");
   const fmtDate=d=>`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
   const start=new Date();
   const end=new Date(Date.now()+14*86400000);
-  const q=new URLSearchParams({station:TIDE_STATION,product:"predictions",datum:"MLLW",interval:"hilo",
+  const q=new URLSearchParams({station,product:"predictions",datum:"MLLW",interval:"hilo",
     units:"english",time_zone:"lst_ldt",format:"json",
     begin_date:fmtDate(start),end_date:fmtDate(end),application:"SwellReader"});
   const r=await fetch(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?${q}`,{cf:{cacheTtl:21600}});
@@ -179,8 +212,8 @@ async function getTides(){
 }
 
 // ---------- 5. buoy height only (for big-surf flag) ----------
-async function getBuoyHeight(){
-  const r=await fetch(`https://www.ndbc.noaa.gov/data/realtime2/${BUOY}.txt`,{cf:{cacheTtl:900}});
+async function getBuoyHeight(buoy){
+  const r=await fetch(`https://www.ndbc.noaa.gov/data/realtime2/${buoy}.txt`,{cf:{cacheTtl:900}});
   if(!r.ok) throw new Error(`buoy ${r.status}`);
   const txt=await r.text();
   for(const line of txt.split("\n").filter(l=>l&&!l.startsWith("#"))){
@@ -289,8 +322,8 @@ function buildMoments(w, tides){
 }
 
 // ---------- NWS Surf Zone Forecast: rip current risk (seasonal) ----------
-async function getSurfZone(){
-  const url=`https://tgftp.nws.noaa.gov/data/forecasts/marine/surf_zone/or/${NWS_SURF_ZONE}.txt`;
+async function getSurfZone(surfZone){
+  const url=`https://tgftp.nws.noaa.gov/data/forecasts/marine/surf_zone/or/${surfZone}.txt`;
   const r=await fetch(url,{ headers:{ "User-Agent":NWS_UA }, cf:{cacheTtl:1800} });
   if(!r.ok) throw new Error(`surfzone ${r.status}`);
   const txt=await r.text();
@@ -362,6 +395,7 @@ function buildCampfire(w, tides){
     notes,
     rulesNote:"Oregon allows beach fires below the vegetation line, under 3 ft across, on most ocean-shore beaches — but seasonal burn bans and local restrictions apply. Always check current rules before you light up.",
     rulesUrl:"https://stateparks.oregon.gov/index.cfm?do=v.page&id=143", // OR State Parks beach fire info
+    putOut:"Putting it out: drown it with water and stir until everything is cold to the touch. Never bury coals in sand — sand insulates them, they smolder for hours, and a buried firepit sends barefoot beachwalkers to the ER every summer.",
   };
 }
 

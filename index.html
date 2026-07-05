@@ -146,7 +146,7 @@
   .tide-scroll::-webkit-scrollbar{height:6px;}
   .tide-scroll::-webkit-scrollbar-thumb{background:rgba(160,190,190,0.25);border-radius:3px;}
   .tide-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);}
-  #tideChart{height:260px;display:block;touch-action:pan-x pan-y;}
+  #tideChart{height:280px;display:block;touch-action:pan-x pan-y;}
   .tide-nav{display:flex;align-items:center;justify-content:space-between;gap:0.8rem;}
   .tide-arrow{background:var(--glass);border:1px solid var(--line);color:var(--foam);font-size:1.3rem;line-height:1;width:38px;height:38px;border-radius:50%;cursor:pointer;flex:none;transition:all 0.15s ease;display:grid;place-items:center;}
   .tide-arrow:hover{border-color:var(--kelp);color:var(--kelp);}
@@ -207,7 +207,6 @@
 
     <div class="tabs" id="tabs">
       <button class="tab on" data-view="today">Today</button>
-      <button class="tab" data-view="tides">Tides &amp; Tidepools</button>
       <button class="tab" data-view="surf">Surf</button>
       <button class="tab" data-view="sky">Sky</button>
     </div>
@@ -219,19 +218,17 @@
     <div id="beachDay"></div>
     <h3 class="block">Wind right now</h3>
     <div id="windMount"></div>
-    <h3 class="block">Tides · next 14 days</h3>
-    <div id="tideMountToday">
-      <div class="panel" id="tidePanel">
-        <div class="tide-nav">
-          <button class="tide-arrow" id="tidePrev" aria-label="Previous day">‹</button>
-          <div class="tide-date" id="tideDate">—</div>
-          <button class="tide-arrow" id="tideNext" aria-label="Next day">›</button>
-        </div>
-        <div class="tide-sub"><span class="tag-inline">South Beach · Yaquina Bay</span> <span id="tideDayHint"></span></div>
-        <div class="tide-scroll" id="tideScroll"><canvas id="tideChart"></canvas></div>
-        <div class="tide-list" id="tideList"></div>
-        <div class="tide-swipe-hint" id="tideSwipeHint">one continuous wave — swipe, drag, or use ‹ › to ride through 14 days</div>
+    <h3 class="block">Plan your trip · tides &amp; weather, next 14 days</h3>
+    <div class="panel" id="tidePanel">
+      <div class="tide-nav">
+        <button class="tide-arrow" id="tidePrev" aria-label="Previous day">‹</button>
+        <div class="tide-date" id="tideDate">—</div>
+        <button class="tide-arrow" id="tideNext" aria-label="Next day">›</button>
       </div>
+      <div class="tide-sub"><span class="tag-inline" id="tideStationLbl">—</span> <span id="tideDayHint"></span></div>
+      <div class="tide-scroll" id="tideScroll"><canvas id="tideChart"></canvas></div>
+      <div class="tide-list" id="tideList"></div>
+      <div class="tide-swipe-hint" id="tideSwipeHint">one continuous wave — swipe, drag, or use ‹ › to ride through 14 days · weather beyond ~7 days is a trend, not a promise</div>
     </div>
     <h3 class="block">Worth seeing today</h3>
     <div class="moments" id="moments"></div>
@@ -239,12 +236,22 @@
     <div id="campfire"></div>
     <h3 class="block">Best shot right now <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">a photographer's read</span></h3>
     <div id="photo"></div>
-  </section>
 
-  <!-- TIDES -->
-  <section class="view" id="view-tides">
-    <div id="tideMountTab"></div>
-    <div class="panel" id="tidepoolPanel"></div>
+    <h3 class="block">Beach smarts <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">know before you go — local knowledge that keeps you out of the ER</span></h3>
+    <div class="moments">
+      <div class="moment"><span class="ico">🌊</span><div><div class="ttl">Sneaker waves are real</div>
+        <div class="txt">Every year they pull people off Oregon beaches. A sneaker wave runs far up the beach with no warning, even on calm days. Never turn your back on the ocean, and keep kids and dogs well back from the waterline.</div></div></div>
+      <div class="moment"><span class="ico">🪵</span><div><div class="ttl">Stay off logs near the water</div>
+        <div class="txt">Wet driftwood logs weigh as much as a car, and even a small wave can lift and roll one. Never sit, stand, or climb on logs anywhere near the surf line — log rolls are one of this coast's deadliest accidents.</div></div></div>
+      <div class="moment"><span class="ico">🌀</span><div><div class="ttl">Caught in a rip current?</div>
+        <div class="txt">Stay calm and don't fight it — you can't out-swim a rip, and exhaustion is what drowns people. Swim parallel to the shore until you're out of the pull, then angle back in. Can't make progress? Float, wave an arm, and yell for help. Rips pull you out, not under.</div></div></div>
+      <div class="moment"><span class="ico">🔥</span><div><div class="ttl">Put fires out with water, never sand</div>
+        <div class="txt">Drown your fire and stir until it's cold to the touch. Burying coals in sand insulates them — they smolder for hours, invisible, and someone barefoot always finds them. Buried firepits send people to the hospital every summer.</div></div></div>
+      <div class="moment"><span class="ico">⛰️</span><div><div class="ttl">The tide can cut you off</div>
+        <div class="txt">Coves and beaches around headlands that are walkable at low tide can disappear on the incoming tide. Check the tide chart above before rounding a point, and know when it turns — give yourself time to get back.</div></div></div>
+      <div class="moment"><span class="ico">🥶</span><div><div class="ttl">The water is 50°F all year</div>
+        <div class="txt">Even in August. Cold-water shock steals your breath and your strength in minutes. Wading is fine — swimming without a wetsuit is not the relaxed dip it looks like.</div></div></div>
+    </div>
   </section>
 
   <!-- SURF -->
@@ -303,7 +310,8 @@ function demoBeach(spotKey){
     campfire:{ favorable:true, summary:"Conditions look workable for a beach fire tonight.",
       notes:["wind is calm enough to keep a fire controlled","evening low tide ~11:58pm exposes dry sand below the wrack line"],
       rulesNote:"Oregon allows beach fires below the vegetation line, under 3 ft across, on most ocean-shore beaches — but seasonal burn bans and local restrictions apply. Always check current rules before you light up.",
-      rulesUrl:"https://stateparks.oregon.gov/index.cfm?do=v.page&id=143" },
+      rulesUrl:"https://stateparks.oregon.gov/index.cfm?do=v.page&id=143",
+      putOut:"Putting it out: drown it with water and stir until everything is cold to the touch. Never bury coals in sand — sand insulates them, they smolder for hours, and a buried firepit sends barefoot beachwalkers to the ER every summer." },
     photo:{ headline:"Dramatic sunset — could be a good one",
       sub:"Broken cloud near sunset is the recipe for color; the clouds catch the light after the sun drops. Don't pack up at sunset — the best color often lands 10–20 min after, into blue hour.",
       techniques:[
@@ -326,8 +334,29 @@ function demoBeach(spotKey){
     ],
     weather:{nowF:54,feelsF:51,highF:59,rainPct:15,cloudPct:35,foggy:false,windKt:8,gustKt:13,windDirDeg:300,uv:3,uvMax:5,
       sunrise:"2026-06-12T05:32",sunset:"2026-06-12T20:58"},
-    tides:demoTides(),
+    tides:demoTides(), daily:demoDaily(),
+    tideStation:{id:"9435380",name:"South Beach · Yaquina Bay"},
+    sources:{zone:"ORZ103",buoy:"46050"},
     surfHeight:6.2, generated:Date.now() };
+}
+
+/* 14 days of plausible demo weather for the planner header */
+function demoDaily(){
+  const out=[]; const start=new Date(); const pad=n=>String(n).padStart(2,"0");
+  const codes=[0,1,2,3,61,2,0,1,3,45,2,1,0,2];
+  for(let d=0;d<14;d++){
+    const b=new Date(start.getTime()+d*86400000);
+    const highF=Math.round(58+6*Math.sin(d/2.5)), rainPct=Math.max(0,Math.round(25+35*Math.sin(d/2+2)));
+    const windKt=Math.round(9+6*Math.sin(d/3+1)), cloudPct=Math.min(100,Math.max(0,Math.round(45+40*Math.sin(d/2.2))));
+    let score=0;
+    if(highF>=62)score+=2;else if(highF>=55)score+=1;
+    if(rainPct<=20)score+=2;else if(rainPct<=50)score+=1;
+    if(windKt<10)score+=2;else if(windKt<18)score+=1;
+    if(cloudPct<=40)score+=1;
+    out.push({day:`${b.getFullYear()}-${pad(b.getMonth()+1)}-${pad(b.getDate())}`,
+      highF,rainPct,cloudPct,windKt,code:codes[d],score,max:7});
+  }
+  return out;
 }
 
 /* 14 days of plausible demo tides (~2 highs + 2 lows/day, drifting ~50min/day) */
@@ -440,6 +469,7 @@ function renderToday(){
         <span class="ico">🔥</span>
         <div><div class="ttl">${cf.summary}</div>
         <div class="txt">${cf.notes.join(" · ")}.</div>
+        ${cf.putOut?`<div class="txt" style="margin-top:0.5rem;color:var(--gold);">💧 ${cf.putOut}</div>`:""}
         <div class="txt" style="margin-top:0.5rem;font-size:0.76rem;">${cf.rulesNote} <a href="${cf.rulesUrl}" target="_blank" rel="noopener" style="color:var(--kelp);">Current Oregon rules →</a></div>
         </div>
       </div>`;
@@ -467,7 +497,15 @@ function renderToday(){
 
 /* ---------- render TIDES: one continuous 14-day wave (Tide Alert style) ---------- */
 let tideDaysArr=[], tidePts=[], tideWired=false, tideCentered=false;
-const TIDE_DAY_W=440, TIDE_CH=260;   // px per day · chart height
+const TIDE_DAY_W=440, TIDE_CH=280;   // px per day · chart height
+/* WMO weather code → emoji for the planner header */
+function wxEmoji(c){
+  if(c==null)return"";
+  if(c<=1)return"☀️"; if(c===2)return"⛅"; if(c===3)return"☁️";
+  if(c===45||c===48)return"🌫️"; if(c>=95)return"⛈️";
+  if(c>=71&&c<=77)return"❄️"; if(c>=51)return"🌧️";
+  return"☁️";
+}
 const hmm=iso=>{const m=(iso||"").match(/T?(\d{1,2}):(\d{2})/);return m?(+m[1]*60+ +m[2]):null;};
 const todayKeyPT=()=>new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
 function tideNowMin(){ // "now" as absolute minutes on the 14-day axis
@@ -489,6 +527,8 @@ function tideHeightAt(min){
 
 function renderTides(){
   const all=(beachData&&beachData.tides)||[]; if(!all.length)return;
+  const lbl=document.getElementById("tideStationLbl");
+  if(lbl)lbl.textContent=beachData.tideStation?.name||"NOAA tide station";
   tideDaysArr=[...new Set(all.map(t=>t.day||(t.time||"").slice(0,10)))].sort();
   tidePts=all.map(t=>{
     const day=t.day||(t.time||"").slice(0,10);
@@ -498,7 +538,6 @@ function renderTides(){
   drawTideWave();
   wireTideNav();
   updateTideReadout();
-  renderTidepools();
   if(!tideCentered){ tideCentered=true; tideScrollToNow(false); }
 }
 
@@ -508,7 +547,7 @@ function drawTideWave(){
   const dpr=Math.min(window.devicePixelRatio||1,2);
   cv.style.width=W+"px"; cv.width=W*dpr; cv.height=H*dpr;
   const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
-  const top=44,bot=H-14;
+  const top=60,bot=H-14;
   const minH=Math.min(...tidePts.map(p=>p.h))-0.7, maxH=Math.max(...tidePts.map(p=>p.h))+1.0;
   const X=min=>min/1440*TIDE_DAY_W, Y=h=>bot-(bot-top)*((h-minH)/(maxH-minH));
 
@@ -517,8 +556,8 @@ function drawTideWave(){
   const srM=hmm(w.sunrise)??360, ssM=hmm(w.sunset)??1230;
   ctx.fillStyle="rgba(0,0,0,0.28)";
   for(let d=0;d<days;d++){
-    ctx.fillRect(X(d*1440),26,srM/1440*TIDE_DAY_W,bot-26);
-    ctx.fillRect(X(d*1440+ssM),26,(1440-ssM)/1440*TIDE_DAY_W,bot-26);
+    ctx.fillRect(X(d*1440),42,srM/1440*TIDE_DAY_W,bot-42);
+    ctx.fillRect(X(d*1440+ssM),42,(1440-ssM)/1440*TIDE_DAY_W,bot-42);
   }
 
   // 0 ft (MLLW) reference when minus tides are in range
@@ -530,17 +569,34 @@ function drawTideWave(){
     ctx.fillText("0 ft",4,y0-4);
   }
 
-  // day boundaries + labels
+  // day boundaries + labels + per-day weather (the trip planner row)
   const tk=todayKeyPT();
-  ctx.font="600 11px 'Spline Sans Mono',monospace";ctx.textAlign="left";
+  const dailyByDay={}; (beachData.daily||[]).forEach(x=>{dailyByDay[x.day]=x;});
+  ctx.textAlign="left";
   tideDaysArr.forEach((day,d)=>{
     const x=X(d*1440);
     if(d>0){ctx.strokeStyle="rgba(74,157,143,0.28)";ctx.lineWidth=1;
-      ctx.beginPath();ctx.moveTo(x,26);ctx.lineTo(x,bot);ctx.stroke();}
+      ctx.beginPath();ctx.moveTo(x,42);ctx.lineTo(x,bot);ctx.stroke();}
     const dObj=new Date(day+"T12:00");
     const lbl=day===tk?"TODAY":dObj.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+    ctx.font="600 11px 'Spline Sans Mono',monospace";
     ctx.fillStyle=day===tk?"#4a9d8f":"#9db4b3";
-    ctx.fillText(lbl,x+8,17);
+    ctx.fillText(lbl,x+8,16);
+    // weather line: beach-day score dot + emoji + high temp + rain + wind
+    const dw=dailyByDay[day];
+    if(dw){
+      const sc=dw.score;
+      if(sc!=null){
+        ctx.beginPath();ctx.arc(x+12,32,4,0,7);
+        ctx.fillStyle=sc>=5?"#4a9d8f":sc>=3?"#e9b949":"#e36f5c";ctx.fill();
+      }
+      ctx.font="11px 'Spline Sans Mono',monospace";ctx.fillStyle="#e8f1ef";
+      const parts=[wxEmoji(dw.code),
+        dw.highF!=null?`${Math.round(dw.highF)}°`:null,
+        dw.rainPct!=null?`${Math.round(dw.rainPct)}%💧`:null,
+        dw.windKt!=null?`${Math.round(dw.windKt*1.151)}mph💨`:null].filter(Boolean);
+      ctx.fillText(parts.join("  "),x+22,36);
+    }
   });
 
   // the wave — one continuous cosine-eased curve through every hi/lo, edge to edge
@@ -580,12 +636,12 @@ function drawTideWave(){
     if(cur){
       const x=X(nowA),y=Y(cur.h);
       ctx.strokeStyle="rgba(232,241,239,0.3)";ctx.lineWidth=1;ctx.setLineDash([3,3]);
-      ctx.beginPath();ctx.moveTo(x,26);ctx.lineTo(x,bot);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.moveTo(x,42);ctx.lineTo(x,bot);ctx.stroke();ctx.setLineDash([]);
       ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fillStyle="rgba(74,157,143,0.25)";ctx.fill();
       ctx.beginPath();ctx.arc(x,y,5.5,0,7);ctx.fillStyle="#4a9d8f";ctx.fill();
       ctx.strokeStyle="#e8f1ef";ctx.lineWidth=2;ctx.stroke();
       ctx.fillStyle="#e8f1ef";ctx.font="600 11px 'Spline Sans Mono',monospace";ctx.textAlign="center";
-      ctx.fillText(`now · ${cur.h.toFixed(1)} ft ${cur.rising?"▲":"▼"}`,x,Math.max(38,y-16));
+      ctx.fillText(`now · ${cur.h.toFixed(1)} ft ${cur.rising?"▲":"▼"}`,x,Math.max(54,y-16));
     }
   }
 }
@@ -632,9 +688,9 @@ function wireTideNav(){
   sc.addEventListener("mousedown",e=>{dragX=e.clientX;dragL=sc.scrollLeft;e.preventDefault();});
   window.addEventListener("mousemove",e=>{if(dragX!=null)sc.scrollLeft=dragL-(e.clientX-dragX);});
   window.addEventListener("mouseup",()=>{dragX=null;});
-  // keyboard ‹ › on the today/tides views
+  // keyboard ‹ › on the main view
   document.addEventListener("keydown",e=>{
-    if(activeView!=="tides"&&activeView!=="today")return;
+    if(activeView!=="today")return;
     if(/^(input|select|textarea)$/i.test(e.target.tagName))return;
     if(e.key==="ArrowLeft")sc.scrollBy({left:-TIDE_DAY_W,behavior:"smooth"});
     else if(e.key==="ArrowRight")sc.scrollBy({left:TIDE_DAY_W,behavior:"smooth"});
@@ -643,24 +699,7 @@ function wireTideNav(){
   setInterval(()=>{ if(tidePts.length){drawTideWave();updateTideReadout();} },180000);
 }
 
-/* the tide panel lives on Today, and moves into the Tides tab when that's active.
-   `keep` is the scroll position captured BEFORE the old view was hidden
-   (display:none zeroes scrollLeft, so it must be read early). */
-function mountTidePanel(view, keep){
-  const panel=document.getElementById("tidePanel"); if(!panel)return;
-  const target=document.getElementById(view==="tides"?"tideMountTab":"tideMountToday");
-  const sc=document.getElementById("tideScroll");
-  if(target&&panel.parentElement!==target) target.appendChild(panel);
-  if(sc&&keep!=null&&keep>0) sc.scrollLeft=keep;
-}
 
-function renderTidepools(){
-  const d=beachData;
-  const pools=(d.moments||[]).filter(m=>m.kind==="tidepool");
-  document.getElementById("tidepoolPanel").innerHTML=`<h3>Tidepool windows <span class="tag">today's daylight low tides</span></h3>`+
-    (pools.length?pools.map(p=>`<div style="margin-top:0.7rem;font-size:0.88rem;"><b>${p.title}.</b> <span style="color:var(--foam-dim)">${p.detail}</span></div>`).join("")
-     :`<div style="margin-top:0.7rem;color:var(--foam-dim);font-size:0.85rem;">No good daylight low-tide window today. Swipe the chart above to scout the next two weeks — minus tides are best for tidepools.</div>`);
-}
 
 /* ---------- render SKY ---------- */
 function renderSky(){
@@ -771,13 +810,15 @@ function renderSurf(){
 function switchView(v){
   activeView=v;
   const sc=document.getElementById("tideScroll");
-  const keepScroll=sc?sc.scrollLeft:0;   // capture before views hide
+  const keepScroll=sc?sc.scrollLeft:0;   // capture before views hide (display:none zeroes it)
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.view===v));
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("on",s.id==="view-"+v));
-  if(v==="tides"){ mountTidePanel("tides", keepScroll); renderTides(); }
-  else if(v==="surf")renderSurf();
+  if(v==="surf")renderSurf();
   else if(v==="sky")renderSky();
-  else { mountTidePanel("today", keepScroll); renderToday(); renderWind(); renderTides(); }
+  else {
+    renderToday(); renderWind(); renderTides();
+    if(sc&&keepScroll>0)sc.scrollLeft=keepScroll;   // restore after the view is visible again
+  }
 }
 
 function buildSpotSel(spots){
@@ -797,9 +838,10 @@ async function load(){
   // render whichever view is active
   switchView(activeView);
   // fineprint
+  const src=beachData.sources||{}, ts=beachData.tideStation||{};
   document.getElementById("fineprint").innerHTML=
     `${beachData.demo?'<div class="demo-banner">⚠ Demo data — deploy beach-worker.js to functions/api/beach.js for live conditions.</div>':""}`+
-    `Safety alerts: National Weather Service (zone ORZ001). Weather &amp; sun: Open-Meteo. Tides: NOAA station 9435380. Surf: NDBC buoy 46050.<br>
+    `Safety alerts: National Weather Service${src.zone?` (zone ${src.zone})`:""}. Weather &amp; sun: Open-Meteo. Tides: NOAA station ${ts.id||""}${ts.name?` (${ts.name})`:""}. Surf: NDBC buoy ${src.buoy||""}.<br>
      Official NWS advisories always take priority over this tool's own readings. Conditions change fast — <b>always watch the ocean before you go near it.</b> In emergencies call 911.`;
   window.addEventListener("resize",()=>{ if(tideDaysArr.length)updateTideReadout(); },{passive:true});
 }
