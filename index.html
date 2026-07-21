@@ -181,6 +181,79 @@
   .fineprint{font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);line-height:1.7;}
   .fineprint a{color:var(--kelp);text-decoration:none;}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}#hero-bg{opacity:1;}}
+
+  /* ---- Photographer tab ---- */
+  .vlayers{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.9rem;}
+  .vbtn{font-family:'Archivo';font-size:0.78rem;font-weight:600;padding:0.4rem 0.85rem;border-radius:100px;border:1px solid var(--line);background:var(--glass);color:var(--foam-dim);cursor:pointer;transition:all 0.15s ease;}
+  .vbtn:hover{color:var(--foam);border-color:var(--kelp);}
+  .vbtn.on{background:var(--kelp);color:var(--abyss);border-color:var(--kelp);}
+  .vwrap{position:relative;margin-top:0.9rem;border-radius:12px;overflow:hidden;border:1px solid var(--line);
+    aspect-ratio:16/10;background:var(--deep);}
+  .vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
+  @media(max-width:560px){.vwrap{aspect-ratio:4/5;}}
+
+  .shoot-grid{display:grid;gap:0.8rem;grid-template-columns:1fr;}
+  @media(min-width:640px){.shoot-grid{grid-template-columns:1fr 1fr;}}
+  .shoot-card{background:var(--glass);border:1px solid var(--line);border-left-width:3px;border-radius:13px;padding:1rem 1.15rem;}
+  .shoot-card.v-fire{border-left-color:var(--coral);}
+  .shoot-card.v-some{border-left-color:var(--gold);}
+  .shoot-card.v-clear{border-left-color:var(--sky);}
+  .shoot-card.v-flat{border-left-color:var(--foam-dim);}
+  .shoot-card.v-mood{border-left-color:var(--kelp);}
+  .shoot-card .sc-top{display:flex;justify-content:space-between;align-items:baseline;gap:0.6rem;flex-wrap:wrap;}
+  .shoot-card .sc-day{font-weight:800;font-size:0.98rem;}
+  .shoot-card .sc-verdict{font-family:'Spline Sans Mono',monospace;font-size:0.72rem;font-weight:600;}
+  .shoot-card.v-fire .sc-verdict{color:var(--coral);}
+  .shoot-card.v-some .sc-verdict{color:var(--gold);}
+  .shoot-card.v-clear .sc-verdict{color:var(--sky);}
+  .shoot-card.v-flat .sc-verdict{color:var(--foam-dim);}
+  .shoot-card.v-mood .sc-verdict{color:var(--kelp);}
+  .shoot-card .sc-time{font-family:'Spline Sans Mono',monospace;font-size:0.76rem;color:var(--foam-dim);margin-top:0.5rem;line-height:1.5;}
+  .shoot-card .sc-clouds{font-family:'Spline Sans Mono',monospace;font-size:0.8rem;margin-top:0.5rem;color:var(--foam);}
+  .shoot-card .sc-why{font-size:0.84rem;color:var(--foam-dim);line-height:1.5;margin-top:0.5rem;}
+
+  .photo-fc{display:flex;gap:0.55rem;overflow-x:auto;padding:0.2rem 0.1rem 0.6rem;-webkit-overflow-scrolling:touch;}
+  .photo-fc::-webkit-scrollbar{height:6px;} .photo-fc::-webkit-scrollbar-thumb{background:#2b4a56;border-radius:3px;}
+  .pfc-day{flex:0 0 auto;width:96px;background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.5rem;text-align:center;}
+  .pfc-day.today{border-color:var(--kelp);}
+  .pfc-dow{font-weight:800;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.03em;}
+  .pfc-dt{font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);margin-top:0.05rem;}
+  .pfc-ic{font-size:1.5rem;line-height:1;margin:0.4rem 0 0.3rem;}
+  .pfc-cloud{font-family:'Spline Sans Mono',monospace;font-size:0.78rem;font-weight:600;}
+  .pfc-cloud span{display:block;font-size:0.55rem;color:var(--foam-dim);font-weight:400;}
+  .pfc-sun{font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);margin-top:0.35rem;line-height:1.5;}
+  .pfc-tag{margin-top:0.45rem;font-family:'Spline Sans Mono',monospace;font-size:0.56rem;font-weight:600;padding:0.2rem 0.3rem;border-radius:6px;line-height:1.2;}
+  .pfc-tag.v-fire{background:rgba(227,111,92,0.18);color:var(--coral);}
+  .pfc-tag.v-some{background:rgba(233,185,73,0.16);color:var(--gold);}
+  .pfc-tag.v-clear{background:rgba(109,181,212,0.16);color:var(--sky);}
+  .pfc-tag.v-flat{background:rgba(157,180,179,0.14);color:var(--foam-dim);}
+  .pfc-tag.v-mood{background:rgba(74,157,143,0.16);color:var(--kelp);}
+
+  /* sun & moon */
+  .astro-grid{display:grid;gap:0.8rem;grid-template-columns:1fr;}
+  @media(min-width:640px){.astro-grid{grid-template-columns:1fr 1fr;}}
+  .astro-row{display:flex;gap:1.3rem;flex-wrap:wrap;margin-top:0.9rem;}
+  .ar-item{display:flex;flex-direction:column;gap:0.15rem;}
+  .ar-item .ar-k{font-family:'Spline Sans Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--foam-dim);}
+  .ar-item .ar-v{font-weight:800;font-size:1.05rem;}
+  .ar-item .ar-d{font-family:'Spline Sans Mono',monospace;font-size:0.72rem;color:var(--sky);}
+  .astro-note{margin-top:0.9rem;padding-top:0.8rem;border-top:1px solid var(--line);font-size:0.82rem;color:var(--foam-dim);line-height:1.5;}
+
+  /* aurora — dark-hours Kp rows */
+  .kp-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);}
+  .kp-legend span{display:inline-flex;align-items:center;gap:0.35rem;}
+  .kp-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  .kp-night{margin-top:1.1rem;}
+  .kp-nlabel{font-family:'Spline Sans Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--foam);margin-bottom:0.45rem;font-weight:600;}
+  .kpr{display:flex;align-items:center;gap:0.7rem;padding:0.18rem 0;}
+  .kpr-t{font-family:'Spline Sans Mono',monospace;font-size:0.68rem;color:var(--foam-dim);width:58px;flex:none;}
+  .kpr-track{flex:1;height:15px;background:rgba(0,0,0,0.28);border-radius:8px;overflow:hidden;}
+  .kpr-fill{height:100%;border-radius:8px;}
+  .kpr-k{font-family:'Spline Sans Mono',monospace;font-weight:700;font-size:0.82rem;width:18px;text-align:right;flex:none;}
+  .kp-quiet .kpr-fill{background:#3f6472;} .kp-quiet .kpr-k{color:var(--foam-dim);}
+  .kp-build .kpr-fill{background:#b89a3e;} .kp-build .kpr-k{color:var(--gold);}
+  .kp-possible .kpr-fill{background:var(--gold);} .kp-possible .kpr-k{color:var(--gold);}
+  .kp-likely .kpr-fill{background:#5fd39a;box-shadow:0 0 10px rgba(95,211,154,0.6);} .kp-likely .kpr-k{color:#5fd39a;}
 </style>
 </head>
 <body>
@@ -208,7 +281,7 @@
     <div class="tabs" id="tabs">
       <button class="tab on" data-view="today">Today</button>
       <button class="tab" data-view="surf">Surf</button>
-      <button class="tab" data-view="sky">Sky</button>
+      <button class="tab" data-view="photo">📷 Photographer</button>
     </div>
   </header>
 
@@ -261,9 +334,11 @@
     </div>
   </section>
 
-  <!-- SKY -->
-  <section class="view" id="view-sky">
-    <div id="skyMount"></div>
+  <!-- PHOTOGRAPHER -->
+  <section class="view" id="view-photo">
+    <div id="photoMount">
+      <div class="loading"><span class="pulse"></span>Loading the photographer's planner…</div>
+    </div>
   </section>
 
   <footer>
@@ -702,36 +777,384 @@ function wireTideNav(){
 
 
 /* ---------- render SKY ---------- */
-function renderSky(){
-  const d=beachData, w=d.weather; if(!w)return;
-  const gh = w.sunset ? addMin(w.sunset,-60) : null;          // evening golden hour
-  const bhEveStart = w.sunset;                                // evening blue hour
-  const bhEveEnd = w.sunset ? addMin(w.sunset,30) : null;
-  const bhMornStart = w.sunrise ? addMin(w.sunrise,-30) : null; // morning blue hour
-  const ghMorn = w.sunrise ? addMin(w.sunrise,60) : null;       // morning golden hour
-  document.getElementById("skyMount").innerHTML=`
+/* ---------- PHOTOGRAPHER tab: cloud map + shoot windows + swell + 10-day sky ---------- */
+// per-spot coords (mirror the worker) so we can fetch cloud/swell + center the map client-side
+const SPOT_COORDS={
+  "seaside-cove":[45.98,-123.94],"short-sand":[45.76,-123.96],"pacific-city":[45.20,-123.97],
+  "otter-rock":[44.75,-124.07],"agate-beach":[44.66,-124.06],"south-beach":[44.61,-124.07],
+  "florence":[43.98,-124.13],"bastendorff":[43.34,-124.34],"port-orford":[42.74,-124.50]
+};
+let photoCache={};
+const ventuskySrc=(lat,lon,layer)=>`https://embed.ventusky.com/?p=${lat};${lon};8&l=${layer}`;
+const toMin=s=>new Date(String(s).replace(" ","T")).getTime()/60000;   // wall-clock minutes (tz-agnostic diffs)
+
+/* ===== SunCalc (c) 2014 Vladimir Agafonkin, MIT — inlined so there's no CDN dependency ===== */
+const SunCalc=(function(){
+  const PI=Math.PI,sin=Math.sin,cos=Math.cos,tan=Math.tan,asin=Math.asin,atan=Math.atan2,acos=Math.acos,rad=PI/180;
+  const dayMs=864e5,J1970=2440588,J2000=2451545;
+  function toJulian(d){return d.valueOf()/dayMs-0.5+J1970;}
+  function fromJulian(j){return new Date((j+0.5-J1970)*dayMs);}
+  function toDays(d){return toJulian(d)-J2000;}
+  const e=rad*23.4397;
+  function ra(l,b){return atan(sin(l)*cos(e)-tan(b)*sin(e),cos(l));}
+  function dec(l,b){return asin(sin(b)*cos(e)+cos(b)*sin(e)*sin(l));}
+  function az(H,phi,d){return atan(sin(H),cos(H)*sin(phi)-tan(d)*cos(phi));}
+  function alt(H,phi,d){return asin(sin(phi)*sin(d)+cos(phi)*cos(d)*cos(H));}
+  function sidereal(d,lw){return rad*(280.16+360.9856235*d)-lw;}
+  function astroRef(h){if(h<0)h=0;return 0.0002967/Math.tan(h+0.00312536/(h+0.08901179));}
+  function solarMeanAnomaly(d){return rad*(357.5291+0.98560028*d);}
+  function eclipticLong(M){const C=rad*(1.9148*sin(M)+0.02*sin(2*M)+0.0003*sin(3*M)),P=rad*102.9372;return M+C+P+PI;}
+  function sunCoords(d){const M=solarMeanAnomaly(d),L=eclipticLong(M);return{dec:dec(L,0),ra:ra(L,0)};}
+  const SC={};
+  SC.getPosition=function(date,lat,lng){const lw=rad*-lng,phi=rad*lat,d=toDays(date),c=sunCoords(d),H=sidereal(d,lw)-c.ra;return{azimuth:az(H,phi,c.dec),altitude:alt(H,phi,c.dec)};};
+  const times=[[-0.833,'sunrise','sunset'],[-6,'dawn','dusk'],[-12,'nauticalDawn','nauticalDusk'],[-18,'nightEnd','night'],[6,'goldenHourEnd','goldenHour']];
+  const J0=0.0009;
+  function jCycle(d,lw){return Math.round(d-J0-lw/(2*PI));}
+  function approxTransit(Ht,lw,n){return J0+(Ht+lw)/(2*PI)+n;}
+  function solarTransitJ(ds,M,L){return J2000+ds+0.0053*sin(M)-0.0069*sin(2*L);}
+  function hourAngle(h,phi,d){return acos((sin(h)-sin(phi)*sin(d))/(cos(phi)*cos(d)));}
+  function getSetJ(h,lw,phi,d,n,M,L){const w=hourAngle(h,phi,d),a=approxTransit(w,lw,n);return solarTransitJ(a,M,L);}
+  SC.getTimes=function(date,lat,lng){const lw=rad*-lng,phi=rad*lat,d=toDays(date),n=jCycle(d,lw),ds=approxTransit(0,lw,n),M=solarMeanAnomaly(ds),L=eclipticLong(M),d2=dec(L,0),Jnoon=solarTransitJ(ds,M,L),result={solarNoon:fromJulian(Jnoon),nadir:fromJulian(Jnoon-0.5)};for(let i=0;i<times.length;i++){const t=times[i],h0=t[0]*rad,Jset=getSetJ(h0,lw,phi,d2,n,M,L),Jrise=Jnoon-(Jset-Jnoon);result[t[1]]=fromJulian(Jrise);result[t[2]]=fromJulian(Jset);}return result;};
+  function moonCoords(d){const L=rad*(218.316+13.176396*d),M=rad*(134.963+13.064993*d),F=rad*(93.272+13.229350*d),l=L+rad*6.289*sin(M),b=rad*5.128*sin(F),dt=385001-20905*cos(M);return{ra:ra(l,b),dec:dec(l,b),dist:dt};}
+  SC.getMoonPosition=function(date,lat,lng){const lw=rad*-lng,phi=rad*lat,d=toDays(date),c=moonCoords(d),H=sidereal(d,lw)-c.ra;let h=alt(H,phi,c.dec);h=h+astroRef(h);return{azimuth:az(H,phi,c.dec),altitude:h,distance:c.dist};};
+  SC.getMoonIllumination=function(date){const d=toDays(date||new Date()),s=sunCoords(d),m=moonCoords(d),sdist=149598000,phi=acos(sin(s.dec)*sin(m.dec)+cos(s.dec)*cos(m.dec)*cos(s.ra-m.ra)),inc=atan(sdist*sin(phi),m.dist-sdist*cos(phi)),angle=atan(cos(s.dec)*sin(s.ra-m.ra),sin(s.dec)*cos(m.dec)-cos(s.dec)*sin(m.dec)*cos(s.ra-m.ra));return{fraction:(1+cos(inc))/2,phase:0.5+0.5*inc*(angle<0?-1:1)/PI,angle:angle};};
+  function hoursLater(d,h){return new Date(d.valueOf()+h*dayMs/24);}
+  SC.getMoonTimes=function(date,lat,lng){const t=new Date(date);t.setHours(0,0,0,0);const hc=0.133*rad;let h0=SC.getMoonPosition(t,lat,lng).altitude-hc,h1,h2,rise,set,a,b,xe,ye,d,roots,x1,x2,dx,ye2;for(let i=1;i<=24;i+=2){h1=SC.getMoonPosition(hoursLater(t,i),lat,lng).altitude-hc;h2=SC.getMoonPosition(hoursLater(t,i+1),lat,lng).altitude-hc;a=(h0+h2)/2-h1;b=(h2-h0)/2;xe=-b/(2*a);ye=(a*xe+b)*xe+h1;d=b*b-4*a*h1;roots=0;if(d>=0){dx=Math.sqrt(d)/(Math.abs(a)*2);x1=xe-dx;x2=xe+dx;if(Math.abs(x1)<=1)roots++;if(Math.abs(x2)<=1)roots++;if(x1<-1)x1=x2;}if(roots===1){if(h0<0)rise=i+x1;else set=i+x1;}else if(roots===2){rise=i+(ye<0?x2:x1);set=i+(ye<0?x1:x2);}if(rise&&set)break;h0=h2;}const r={};if(rise)r.rise=hoursLater(t,rise);if(set)r.set=hoursLater(t,set);if(!rise&&!set)r[ye>0?'alwaysUp':'alwaysDown']=true;return r;};
+  return SC;
+})();
+
+// azimuth (radians, SunCalc's south-based) -> compass {deg, dir}
+function compassFrom(azRad){ let deg=(azRad*180/Math.PI+180)%360; deg=(deg+360)%360; return {deg:Math.round(deg), dir:dirName(deg)}; }
+// SunCalc Date -> local Pacific clock like "8:53pm"
+function fmtClock(date){ if(!date||isNaN(+date))return"—"; return date.toLocaleTimeString("en-US",{timeZone:"America/Los_Angeles",hour:"numeric",minute:"2-digit"}).replace(/\s/g,"").toLowerCase(); }
+// moon illumination -> {name, emoji, waxing, pct}
+function moonPhaseInfo(mi){
+  const p=mi.phase, steps=[[0.02,"New moon","🌑"],[0.24,"Waxing crescent","🌒"],[0.26,"First quarter","🌓"],[0.49,"Waxing gibbous","🌔"],[0.51,"Full moon","🌕"],[0.74,"Waning gibbous","🌖"],[0.76,"Last quarter","🌗"],[0.98,"Waning crescent","🌘"]];
+  let nm="New moon", em="🌑";
+  for(const s of steps){ if(p<=s[0]){ nm=s[1]; em=s[2]; break; } }
+  return {name:nm, emoji:em, waxing:p<0.5, pct:Math.round(mi.fraction*100)};
+}
+
+function renderPhoto(){
+  const [lat,lon]=SPOT_COORDS[activeSpot]||SPOT_COORDS["south-beach"];
+  const el=document.getElementById("photoMount");
+  el.innerHTML=`
     <div class="panel">
-      <h3>Sun &amp; light <span class="tag">today</span></h3>
-      <div class="wx" style="border-top:none;margin-top:0.8rem;padding-top:0;">
-        <div class="m"><span class="k">Sunrise</span><span class="v">${fmtTime(w.sunrise)}</span></div>
-        <div class="m"><span class="k">Sunset</span><span class="v">${fmtTime(w.sunset)}</span></div>
-        <div class="m"><span class="k">UV max</span><span class="v">${fmt(w.uvMax)}</span></div>
+      <h3>Cloud &amp; sky map <span class="tag">live · hour by hour</span></h3>
+      <p style="margin-top:0.6rem;font-size:0.86rem;color:var(--foam-dim);line-height:1.5;">Press play or drag the timeline at the bottom of the map to watch the clouds move. Broken <b style="color:var(--foam)">high &amp; mid clouds</b> near sunset are what catch fire — flat overcast or dead-clear skies rarely do.</p>
+      <div class="vlayers" id="vLayers">
+        <button class="vbtn on" data-layer="clouds-total">Total cloud</button>
+        <button class="vbtn" data-layer="clouds-high">High cloud</button>
+        <button class="vbtn" data-layer="rain-3h">Rain</button>
+        <button class="vbtn" data-layer="wind">Wind</button>
+        <button class="vbtn" data-layer="wave">Waves</button>
       </div>
-      <div style="margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--line);">
-        <div style="font-family:'Spline Sans Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--foam-dim);margin-bottom:0.6rem;">Best light windows</div>
-        <div style="display:grid;gap:0.55rem;">
-          <div style="display:flex;gap:0.7rem;align-items:baseline;"><span style="color:var(--sky);font-weight:700;font-size:0.85rem;min-width:88px;">Blue hour</span><span style="font-family:'Spline Sans Mono',monospace;font-size:0.82rem;">${bhMornStart?fmtTime(bhMornStart):"—"}–${fmtTime(w.sunrise)}<span style="color:var(--foam-dim);"> (dawn)</span></span></div>
-          <div style="display:flex;gap:0.7rem;align-items:baseline;"><span style="color:var(--gold);font-weight:700;font-size:0.85rem;min-width:88px;">Golden hour</span><span style="font-family:'Spline Sans Mono',monospace;font-size:0.82rem;">${w.sunrise?fmtTime(w.sunrise):"—"}–${ghMorn?fmtTime(ghMorn):"—"}<span style="color:var(--foam-dim);"> (morning)</span></span></div>
-          <div style="display:flex;gap:0.7rem;align-items:baseline;"><span style="color:var(--gold);font-weight:700;font-size:0.85rem;min-width:88px;">Golden hour</span><span style="font-family:'Spline Sans Mono',monospace;font-size:0.82rem;">${gh?fmtTime(gh):"—"}–${fmtTime(w.sunset)}<span style="color:var(--foam-dim);"> (evening)</span></span></div>
-          <div style="display:flex;gap:0.7rem;align-items:baseline;"><span style="color:var(--sky);font-weight:700;font-size:0.85rem;min-width:88px;">Blue hour</span><span style="font-family:'Spline Sans Mono',monospace;font-size:0.82rem;">${fmtTime(bhEveStart)}–${bhEveEnd?fmtTime(bhEveEnd):"—"}<span style="color:var(--foam-dim);"> (dusk)</span></span></div>
-        </div>
-      </div>
-      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line);font-size:0.82rem;color:var(--foam-dim);line-height:1.55;">
-        <b style="color:var(--gold);">Golden hour</b> is the warm, low, raking light just after sunrise and before sunset — the classic coast glow.
-        <b style="color:var(--sky);">Blue hour</b> is the short window just before sunrise and just after sunset, when the sky deepens to cobalt and the sea goes soft and luminous — quieter, moodier, and a favorite for long exposures.
-        ${w.foggy?" Fog is in right now — it can turn blue hour into something ethereal, but watch your footing near the water.":" Clear enough for color if the marine layer holds off."}
-      </div>
+      <div class="vwrap"><iframe id="vFrame" src="${ventuskySrc(lat,lon,'clouds-total')}" loading="lazy" title="Ventusky cloud map" allowfullscreen></iframe></div>
+      <div style="margin-top:0.5rem;font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);">Interactive map &amp; animation by <a href="https://www.ventusky.com" target="_blank" rel="noopener" style="color:var(--kelp);">Ventusky</a> · centered on ${beachData?.spot?.name||"this beach"}.</div>
+    </div>
+
+    <h3 class="block">Best windows to shoot <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">next few days · light + clouds + tide</span></h3>
+    <div id="shootWindows"><div class="loading"><span class="pulse"></span>Reading the light &amp; clouds…</div></div>
+
+    <h3 class="block">Sun &amp; moon <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">rise, set &amp; where on the horizon</span></h3>
+    <div class="astro-grid"><div id="sunBox"></div><div id="moonBox"></div></div>
+
+    <h3 class="block">Aurora forecast <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">Kp outlook · next few nights</span></h3>
+    <div id="auroraBox"><div class="loading"><span class="pulse"></span>Checking space weather…</div></div>
+
+    <h3 class="block">Astro events <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">next meteor showers</span></h3>
+    <div id="astroBox"></div>
+
+    <h3 class="block">Swell for the surf shots</h3>
+    <div id="photoSwell"><div class="loading"><span class="pulse"></span>Reading the swell…</div></div>
+
+    <h3 class="block">10-day sky outlook <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">cloud cover at each sunset</span></h3>
+    <div id="photoForecast"></div>`;
+
+  document.getElementById("vLayers").addEventListener("click",e=>{
+    const b=e.target.closest(".vbtn"); if(!b)return;
+    document.querySelectorAll("#vLayers .vbtn").forEach(x=>x.classList.toggle("on",x===b));
+    document.getElementById("vFrame").src=ventuskySrc(lat,lon,b.dataset.layer);
+  });
+
+  loadPhotoData(lat,lon);
+  renderSunMoon(lat,lon);   // instant (no API)
+  renderAstro();            // instant (no API)
+  loadAurora();             // NOAA space-weather fetch
+}
+
+async function loadPhotoData(lat,lon){
+  if(photoCache[activeSpot]){ fillPhoto(photoCache[activeSpot]); return; }
+  try{
+    const wxU=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`+
+      `&hourly=cloud_cover,cloud_cover_high,cloud_cover_mid,cloud_cover_low,visibility`+
+      `&daily=sunrise,sunset&timezone=America%2FLos_Angeles&forecast_days=10`;
+    const mU=`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}`+
+      `&hourly=swell_wave_height,swell_wave_period,swell_wave_direction,wave_height&timezone=America%2FLos_Angeles&forecast_days=3&length_unit=imperial`;
+    const [wxr,mr]=await Promise.all([fetch(wxU),fetch(mU).catch(()=>null)]);
+    if(!wxr.ok) throw 0;
+    const data={wx:await wxr.json(), marine:(mr&&mr.ok)?await mr.json():null};
+    photoCache[activeSpot]=data;
+    fillPhoto(data);
+  }catch(e){
+    document.getElementById("shootWindows").innerHTML=`<div class="panel"><span style="color:var(--foam-dim)">Couldn't load the sky forecast just now — try again shortly.</span></div>`;
+    document.getElementById("photoSwell").innerHTML="";
+  }
+}
+
+// hourly index nearest an ISO time (hour granularity)
+function nearestHourIdx(times,iso){
+  if(!times||!times.length) return 0;
+  const target=String(iso).slice(0,13); // YYYY-MM-DDTHH
+  let idx=times.findIndex(t=>t.slice(0,13)===target);
+  if(idx<0){ const tm=toMin(iso); let bd=1e9; times.forEach((t,i)=>{const dd=Math.abs(toMin(t)-tm); if(dd<bd){bd=dd;idx=i;}}); }
+  return idx<0?0:idx;
+}
+// clouds -> "will the sky light up?" read
+function colorVerdict(ct,ch,cm,cl,foggy){
+  if(foggy) return {label:"Moody &amp; ethereal", icon:"🌫️", cls:"v-mood", why:"Fog strips the scene to mood — clean negative space and one strong subject. Underexpose slightly to hold it."};
+  if(ct==null) return {label:"—", icon:"🌤️", cls:"v-some", why:""};
+  const highMid=Math.max(cm||0,ch||0);
+  if(ct>=90) return {label:"Flat &amp; muted", icon:"☁️", cls:"v-flat", why:"Thick overcast — soft, even light. Great for tide-pool detail and silky long exposures, but little sunset color."};
+  if(ct<15) return {label:"Clear &amp; clean", icon:"☀️", cls:"v-clear", why:"Clear skies — simple and clean, but low drama. Shoot minimalist horizons, silhouettes, and the deep blue-hour gradient."};
+  if(highMid>=25 && highMid<=80 && ct<85) return {label:"High color potential", icon:"🔥", cls:"v-fire", why:"Broken high &amp; mid clouds with gaps near the horizon — the recipe for a sky that lights up. Be set up 20 min early and stay 20 min after."};
+  return {label:"Some potential", icon:"🌤️", cls:"v-some", why:"A mix of cloud and clear — could go either way. Worth being out; watch the western horizon for a gap the sun can slip through."};
+}
+// closest tide extreme within ~2.5h of an event, framed for photos
+function tideNear(iso){
+  const tides=(beachData&&beachData.tides)||[]; if(!tides.length) return "";
+  const evM=toMin(iso); let best=null,bd=1e9;
+  tides.forEach(t=>{ const dd=Math.abs(toMin(t.time)-evM); if(dd<bd){bd=dd;best=t;} });
+  if(!best||bd>150) return "";
+  if(best.type==="low"&&best.heightFt<=2.5) return `<b style="color:var(--gold)">Low tide ${best.heightFt.toFixed(1)}ft @ ${fmtTime(best.time)}</b> — wet-sand reflections &amp; exposed sea stacks`;
+  if(best.type==="low") return `Low tide near ${fmtTime(best.time)} — more beach &amp; foreground`;
+  return `High tide ${best.heightFt.toFixed(1)}ft @ ${fmtTime(best.time)}`;
+}
+
+function fillPhoto(data){
+  const H=(data.wx&&data.wx.hourly)||{}, D=(data.wx&&data.wx.daily)||{};
+  // upcoming sunrise/sunset events (next 4)
+  const events=[];
+  (D.time||[]).forEach((day,i)=>{
+    if(D.sunrise&&D.sunrise[i]) events.push({type:"sunrise",iso:D.sunrise[i]});
+    if(D.sunset&&D.sunset[i]) events.push({type:"sunset",iso:D.sunset[i]});
+  });
+  const nowT=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,16).replace(" ","T");
+  const upcoming=events.filter(e=>e.iso>=nowT).sort((a,b)=>a.iso<b.iso?-1:1).slice(0,4);
+
+  const cards=upcoming.map(ev=>{
+    const idx=nearestHourIdx(H.time,ev.iso);
+    const ct=H.cloud_cover?.[idx], ch=H.cloud_cover_high?.[idx], cm=H.cloud_cover_mid?.[idx], cl=H.cloud_cover_low?.[idx];
+    const vis=H.visibility?.[idx]; const foggy=vis!=null&&vis<2000;
+    const v=colorVerdict(ct,ch,cm,cl,foggy);
+    const dO=new Date(String(ev.iso).replace(" ","T"));
+    const todayKey=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
+    const isToday=String(ev.iso).slice(0,10)===todayKey;
+    const dayLbl=(isToday?"Today":dO.toLocaleDateString("en-US",{weekday:"long"}));
+    const times = ev.type==="sunset"
+      ? `Golden ${fmtTime(addMin(ev.iso,-60))} · <b style="color:var(--gold)">Sunset ${fmtTime(ev.iso)}</b> · Blue hour to ${fmtTime(addMin(ev.iso,30))}`
+      : `Blue hour from ${fmtTime(addMin(ev.iso,-30))} · <b style="color:var(--gold)">Sunrise ${fmtTime(ev.iso)}</b> · Golden to ${fmtTime(addMin(ev.iso,60))}`;
+    const tide=tideNear(ev.iso);
+    return `<div class="shoot-card ${v.cls}">
+      <div class="sc-top"><span class="sc-day">${dayLbl} ${ev.type==="sunset"?"sunset":"sunrise"}</span><span class="sc-verdict">${v.icon} ${v.label}</span></div>
+      <div class="sc-time">${times}</div>
+      <div class="sc-clouds">${ct==null?"—":ct+"% cloud"} <span style="opacity:0.6">(${cm==null?"–":cm+"% mid"}, ${ch==null?"–":ch+"% high"})</span></div>
+      <div class="sc-why">${v.why}${tide?` <span style="color:var(--foam-dim)">·</span> ${tide}`:""}</div>
     </div>`;
+  }).join("");
+  document.getElementById("shootWindows").innerHTML = cards
+    ? `<div class="shoot-grid">${cards}</div>`
+    : `<div class="panel"><span style="color:var(--foam-dim)">No upcoming light windows in range.</span></div>`;
+
+  fillSwell(data.marine);
+  fill10day(D,H);
+}
+
+function fillSwell(marine){
+  const el=document.getElementById("photoSwell");
+  if(!marine||!marine.hourly){ el.innerHTML=`<div class="panel"><span style="color:var(--foam-dim)">Swell data unavailable right now. The full <a href="https://surf.jburkephotos.com" style="color:var(--kelp)">Surf Report</a> has the detail.</span></div>`; return; }
+  const Hh=marine.hourly, times=Hh.time||[];
+  const nowH=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,13);
+  let i=times.findIndex(t=>t.slice(0,13)>=nowH); if(i<0)i=0;
+  const sh=Hh.swell_wave_height?.[i], sp=Hh.swell_wave_period?.[i], sd=Hh.swell_wave_direction?.[i], wh=Hh.wave_height?.[i];
+  let read;
+  if(sh>=8) read="Big, powerful surf — dramatic explosions on the rocks and headlands. Shoot from a safe height, never the waterline; a fast shutter (1/1000s+) freezes every droplet.";
+  else if(sh>=4) read="A solid swell — good wave action and whitewater. Long lenses compress the sets; 1/1000s freezes them, or drop to 1/8–1/2s to blur the motion.";
+  else if(sh>=1.5) read="Small, clean surf — glassy and gentle. Ideal for silky long exposures and mirror reflections, especially around low tide.";
+  else read="Nearly flat — mirror-calm sea. Perfect for minimalist long exposures and reflected sunsets.";
+  el.innerHTML=`<div class="panel"><div class="wx" style="border-top:none;margin-top:0;padding-top:0;">
+      <div class="m"><span class="k">Primary swell</span><span class="v">${fmt(sh)}<span>ft</span></span></div>
+      <div class="m"><span class="k">Period</span><span class="v">${fmt(sp)}<span>s</span></span></div>
+      <div class="m"><span class="k">From</span><span class="v" style="font-size:1.05rem;">${dirName(sd)}</span></div>
+      <div class="m"><span class="k">Combined</span><span class="v">${fmt(wh)}<span>ft</span></span></div>
+    </div>
+    <div style="margin-top:0.8rem;font-size:0.86rem;color:var(--foam-dim);line-height:1.5;">${read}</div></div>`;
+}
+
+function fill10day(D,H){
+  const el=document.getElementById("photoForecast");
+  const days=D.time||[]; if(!days.length){ el.innerHTML=""; return; }
+  const todayKey=new Date().toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(0,10);
+  let html='<div class="photo-fc">';
+  days.forEach((day,i)=>{
+    const isToday=day===todayKey;
+    const ssIdx=(D.sunset&&D.sunset[i])?nearestHourIdx(H.time,D.sunset[i]):null;
+    const ctS=ssIdx!=null?H.cloud_cover?.[ssIdx]:null, chS=ssIdx!=null?H.cloud_cover_high?.[ssIdx]:null, cmS=ssIdx!=null?H.cloud_cover_mid?.[ssIdx]:null;
+    const v=colorVerdict(ctS,chS,cmS,0,false);
+    const dO=new Date(day+"T12:00");
+    html+=`<div class="pfc-day${isToday?' today':''}">
+      <div class="pfc-dow">${isToday?'Today':dO.toLocaleDateString('en-US',{weekday:'short'})}</div>
+      <div class="pfc-dt">${dO.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+      <div class="pfc-ic">${v.icon}</div>
+      <div class="pfc-cloud">${ctS==null?'—':ctS+'%'}<span>@ set</span></div>
+      <div class="pfc-sun">${D.sunrise?fmtTime(D.sunrise[i]):'—'}<br>${D.sunset?fmtTime(D.sunset[i]):'—'}</div>
+      <div class="pfc-tag ${v.cls}">${v.label}</div>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+/* ---------- Sun & Moon (SunCalc, no API) ---------- */
+function renderSunMoon(lat,lon){
+  const now=new Date();
+  const st=SunCalc.getTimes(now,lat,lon);
+  const sp=SunCalc.getPosition(now,lat,lon);
+  const srAz=compassFrom(SunCalc.getPosition(st.sunrise,lat,lon).azimuth);
+  const ssAz=compassFrom(SunCalc.getPosition(st.sunset,lat,lon).azimuth);
+  const sunUp=sp.altitude>0, sunAlt=Math.round(sp.altitude*180/Math.PI), sunAz=compassFrom(sp.azimuth);
+  const sunBox=document.getElementById("sunBox");
+  if(sunBox) sunBox.innerHTML=`<div class="panel">
+    <h3>Sun ☀️ <span class="tag">rise / set + horizon bearing</span></h3>
+    <div class="astro-row">
+      <div class="ar-item"><span class="ar-k">Sunrise</span><span class="ar-v">${fmtClock(st.sunrise)}</span><span class="ar-d">${srAz.dir} · ${srAz.deg}°</span></div>
+      <div class="ar-item"><span class="ar-k">Sunset</span><span class="ar-v">${fmtClock(st.sunset)}</span><span class="ar-d">${ssAz.dir} · ${ssAz.deg}°</span></div>
+      <div class="ar-item"><span class="ar-k">Sun now</span><span class="ar-v">${sunUp?sunAlt+"° up":"below horizon"}</span><span class="ar-d">${sunUp?sunAz.dir+" · "+sunAz.deg+"°":"—"}</span></div>
+    </div>
+    <div class="astro-note">The bearing is where the sun meets the horizon — line it up behind a sea stack or headland. It swings north through summer, south toward winter.</div>
+  </div>`;
+
+  const mt=SunCalc.getMoonTimes(now,lat,lon);
+  const mtNext=SunCalc.getMoonTimes(new Date(now.getTime()+864e5),lat,lon);
+  const mRise=mt.rise||mtNext.rise, mSet=mt.set||mtNext.set;   // next rise/set even if after midnight
+  const mp=SunCalc.getMoonPosition(now,lat,lon);
+  const mi=SunCalc.getMoonIllumination(now);
+  const ph=moonPhaseInfo(mi);
+  const mrAz=mRise?compassFrom(SunCalc.getMoonPosition(mRise,lat,lon).azimuth):null;
+  const msAz=mSet?compassFrom(SunCalc.getMoonPosition(mSet,lat,lon).azimuth):null;
+  const moonUp=mp.altitude>0;
+  let darkNote;
+  if(ph.pct<=25) darkNote="Dark skies — ideal for stars, the Milky Way, aurora and meteor showers.";
+  else if(ph.pct>=70) darkNote="A bright moon washes out faint stars, but beautifully lights the landscape and surf for night shots.";
+  else darkNote="A partial moon — some sky glow, but still workable for landscape astro.";
+  const moonBox=document.getElementById("moonBox");
+  if(moonBox) moonBox.innerHTML=`<div class="panel">
+    <h3>Moon <span style="font-size:1.2rem;">${ph.emoji}</span> <span class="tag">phase · rise / set</span></h3>
+    <div class="astro-row">
+      <div class="ar-item"><span class="ar-k">Phase</span><span class="ar-v">${ph.name}</span><span class="ar-d">${ph.pct}% lit · ${ph.waxing?"waxing":"waning"}</span></div>
+      <div class="ar-item"><span class="ar-k">Moonrise</span><span class="ar-v">${mRise?fmtClock(mRise):(mt.alwaysUp?"up all day":"—")}</span><span class="ar-d">${mrAz?mrAz.dir+" · "+mrAz.deg+"°":"—"}</span></div>
+      <div class="ar-item"><span class="ar-k">Moonset</span><span class="ar-v">${mSet?fmtClock(mSet):(mt.alwaysDown?"down all day":"—")}</span><span class="ar-d">${msAz?msAz.dir+" · "+msAz.deg+"°":"—"}</span></div>
+    </div>
+    <div class="astro-note">${moonUp?"Up now. ":""}${darkNote}</div>
+  </div>`;
+}
+
+/* ---------- Aurora: NOAA SWPC Kp forecast (long outlook) ---------- */
+// Oregon coast (~geomag 51°N): aurora on the north horizon needs a real storm.
+function kpColor(k){ return k>=7?"var(--coral)":k>=5?"var(--gold)":"var(--kelp)"; }
+const KP_POSSIBLE=6, KP_LIKELY=7;   // Oregon-coast north-horizon thresholds
+function fmtHour(h){ h=((h%24)+24)%24; if(h===0)return"12am"; if(h===12)return"12pm"; return h<12?h+"am":(h-12)+"pm"; }
+function loadAurora(){
+  const el=document.getElementById("auroraBox"); if(!el)return;
+  const [lat,lon]=SPOT_COORDS[activeSpot]||SPOT_COORDS["south-beach"];
+  const spotName=(beachData&&beachData.spot&&beachData.spot.name)||"the Oregon coast";
+  fetch("https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json")
+    .then(r=>{ if(!r.ok)throw 0; return r.json(); })
+    .then(rows=>{
+      const nowMs=Date.now();
+      const data=rows.filter(r=>r&&r.time_tag&&r.kp!=null)
+        .map(r=>({dt:new Date(r.time_tag+"Z"), kp:parseFloat(r.kp), obs:r.observed}))
+        .filter(r=>!isNaN(r.kp));
+      // 3-hour Kp -> smooth hourly trend (Kp is a 3-hour index; hourly is interpolated)
+      const sorted=data.slice().sort((a,b)=>a.dt-b.dt);
+      const pts=sorted.map(r=>({ms:r.dt.getTime(), kp:r.kp}));
+      const kpAt=ms=>{ if(ms<=pts[0].ms)return pts[0].kp; if(ms>=pts[pts.length-1].ms)return pts[pts.length-1].kp;
+        for(let i=0;i<pts.length-1;i++){ if(ms>=pts[i].ms&&ms<=pts[i+1].ms){ const f=(ms-pts[i].ms)/((pts[i+1].ms-pts[i].ms)||1); return pts[i].kp+(pts[i+1].kp-pts[i].kp)*f; } } return pts[pts.length-1].kp; };
+      const pred=sorted.filter(r=>r.obs==="predicted");
+      const startMs=pred.length?pred[0].dt.getTime():pts[0].ms, endMs=pts[pts.length-1].ms;
+      // one row per DARK hour at this spot (sun below civil twilight, -6°)
+      const dark=[];
+      for(let ms=Math.ceil(startMs/3600e3)*3600e3; ms<=endMs; ms+=3600e3){
+        if(SunCalc.getPosition(new Date(ms+18e5),lat,lon).altitude < -6*Math.PI/180) dark.push({dt:new Date(ms), kp:kpAt(ms)});
+      }
+      if(!dark.length){ el.innerHTML=`<div class="panel"><h3>Aurora — ${spotName} <span class="tag">dark hours · NOAA Kp</span></h3><div style="margin-top:0.8rem;color:var(--foam-dim);font-size:0.86rem;line-height:1.5;">No forecast covering the coming nights just now — check back later.</div></div>`; return; }
+      // helpers to name a night from a Pacific datetime (early-AM belongs to prior evening)
+      const nkey=d=>d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
+      const nightDateOf=dt=>{ const pt=dt.toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"});
+        let nd=new Date(pt.slice(0,10)+"T12:00"); if(+pt.slice(11,13)<12) nd=new Date(nd.getTime()-864e5); return nd; };
+      const now=new Date(), tmr=new Date(now.getTime()+864e5);
+      const nightLabel=nd=>{ if(nkey(nd)===nkey(now))return"Tonight"; if(nkey(nd)===nkey(tmr))return"Tomorrow night"; return nd.toLocaleDateString("en-US",{weekday:"long"})+" night"; };
+      // group dark windows into nights
+      const nights=[], idx={};
+      dark.forEach(r=>{ const nd=nightDateOf(r.dt), k=nkey(nd);
+        if(!(k in idx)){ idx[k]=nights.length; nights.push({date:nd, rows:[]}); }
+        nights[idx[k]].rows.push(r); });
+      const show=nights.slice(0,3);
+      const maxKp=Math.max(...dark.map(r=>r.kp));
+      let best=dark[0]; dark.forEach(r=>{ if(r.kp>best.kp) best=r; });
+      const bestLbl=nightLabel(nightDateOf(best.dt)).toLowerCase();
+      const bestTime=fmtHour(+best.dt.toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(11,13));
+      let vhead,vcol,verdict;
+      if(maxKp>=KP_LIKELY){ vhead="Get out there."; vcol="#5fd39a"; verdict=`A real chance — Kp peaks near <b>${maxKp.toFixed(1)}</b> ${bestLbl} around ${bestTime}. Head to a dark, north-facing beach away from town lights and look low to the north.`; }
+      else if(maxKp>=KP_POSSIBLE){ vhead="Worth a look."; vcol="var(--gold)"; verdict=`Kp could reach <b>${maxKp.toFixed(1)}</b> ${bestLbl} around ${bestTime} — enough for a faint glow low on the northern horizon if skies stay clear. No promises, but keep an eye north.`; }
+      else { vhead="Quiet."; vcol="var(--foam-dim)"; verdict=`The forecast peaks at Kp <b>${maxKp.toFixed(1)}</b> during dark hours — below the ~Kp ${KP_POSSIBLE} this coast needs before aurora clears the horizon. Nothing expected here.`; }
+      const nightsHtml=show.map(n=>{
+        const rowsH=n.rows.map(r=>{ const hr=+r.dt.toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(11,13);
+          const cls=r.kp>=KP_LIKELY?"kp-likely":r.kp>=KP_POSSIBLE?"kp-possible":r.kp>=5?"kp-build":"kp-quiet";
+          const w=Math.max(4,Math.round(r.kp/9*100));
+          return `<div class="kpr ${cls}"><span class="kpr-t">${fmtHour(hr)}</span><div class="kpr-track"><div class="kpr-fill" style="width:${w}%"></div></div><span class="kpr-k">${r.kp.toFixed(1)}</span></div>`; }).join("");
+        return `<div class="kp-night"><div class="kp-nlabel">${nightLabel(n.date)}</div>${rowsH}</div>`;
+      }).join("");
+      el.innerHTML=`<div class="panel">
+        <h3>Aurora — ${spotName} <span class="tag">hour by hour · dark only</span></h3>
+        <div style="margin-top:0.5rem;font-size:0.9rem;line-height:1.5;"><b style="color:${vcol}">${vhead}</b> <span style="color:var(--foam-dim)">${verdict}</span></div>
+        <div class="kp-legend"><span><i style="background:#5fd39a"></i>Kp ${KP_LIKELY}+ likely here</span><span><i style="background:var(--gold)"></i>Kp ${KP_POSSIBLE} possible</span><span><i style="background:#3f6472"></i>below threshold</span></div>
+        ${nightsHtml}
+        <div style="margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);line-height:1.6;">Only ${spotName}'s dark hours are shown — aurora is invisible in daylight. Kp is a 3-hour index; hourly values are smoothed between NOAA's 3-hour steps to show the trend. This coast (~45°N) needs about Kp ${KP_POSSIBLE} for a faint glow, Kp ${KP_LIKELY}+ for a real show. Data: NOAA SWPC.</div>
+      </div>`;
+    })
+    .catch(()=>{ el.innerHTML=`<div class="panel"><span style="color:var(--foam-dim)">Aurora forecast unavailable right now.</span></div>`; });
+}
+
+/* ---------- Astro events: next major meteor shower + moon interference ---------- */
+const METEORS=[
+  {name:"Quadrantids",peak:"01-03",zhr:110},{name:"Lyrids",peak:"04-22",zhr:18},
+  {name:"Eta Aquariids",peak:"05-06",zhr:50},{name:"Perseids",peak:"08-12",zhr:100},
+  {name:"Orionids",peak:"10-21",zhr:20},{name:"Leonids",peak:"11-17",zhr:15},
+  {name:"Geminids",peak:"12-14",zhr:150},{name:"Ursids",peak:"12-22",zhr:10}
+];
+function renderAstro(){
+  const el=document.getElementById("astroBox"); if(!el)return;
+  const now=new Date(), y=now.getFullYear();
+  const list=METEORS.map(s=>{ const [mo,da]=s.peak.split("-").map(Number);
+    let pk=new Date(y,mo-1,da,2,0); if(pk<now) pk=new Date(y+1,mo-1,da,2,0);
+    return {...s, pk};
+  }).sort((a,b)=>a.pk-b.pk).slice(0,2);
+  const cards=list.map((s,idx)=>{
+    const days=Math.round((s.pk-now)/864e5);
+    const mi=SunCalc.getMoonIllumination(s.pk), lit=Math.round(mi.fraction*100);
+    let moonNote;
+    if(lit<=30) moonNote=`🌑 <b style="color:var(--kelp)">Dark moon (${lit}% lit)</b> — excellent viewing.`;
+    else if(lit<=65) moonNote=`🌓 Moon ${lit}% lit — some interference, best after it sets.`;
+    else moonNote=`🌕 <b style="color:var(--gold)">Bright moon (${lit}% lit)</b> will wash out all but the brightest.`;
+    const when=s.pk.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
+    return `<div class="shoot-card ${idx===0?'v-fire':'v-some'}">
+      <div class="sc-top"><span class="sc-day">${s.name}${idx===0?" — next up":""}</span><span class="sc-verdict">${days===0?"tonight":days+" days"}</span></div>
+      <div class="sc-time">Peaks <b style="color:var(--gold)">${when}</b> · up to ~${s.zhr}/hr at the radiant under ideal skies</div>
+      <div class="sc-why">Best after midnight, looking up from the darkest beach you can reach. ${moonNote}</div>
+    </div>`;
+  }).join("");
+  el.innerHTML=`<div class="shoot-grid">${cards}</div>`;
 }
 
 /* ---------- render WIND (shared design language with the Surf Report) ---------- */
@@ -814,7 +1237,7 @@ function switchView(v){
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.view===v));
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("on",s.id==="view-"+v));
   if(v==="surf")renderSurf();
-  else if(v==="sky")renderSky();
+  else if(v==="photo")renderPhoto();
   else {
     renderToday(); renderWind(); renderTides();
     if(sc&&keepScroll>0)sc.scrollLeft=keepScroll;   // restore after the view is visible again
