@@ -239,6 +239,16 @@
   .ar-item .ar-d{font-family:'Spline Sans Mono',monospace;font-size:0.72rem;color:var(--sky);}
   .astro-note{margin-top:0.9rem;padding-top:0.8rem;border-top:1px solid var(--line);font-size:0.82rem;color:var(--foam-dim);line-height:1.5;}
 
+  /* Milky Way sky chart */
+  .skywrap{display:flex;gap:1.3rem;align-items:center;flex-wrap:wrap;}
+  .skychart-box{flex:0 0 200px;max-width:200px;}
+  .skychart{width:100%;height:auto;display:block;}
+  .skydetail{flex:1;min-width:200px;}
+  .skylegend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);}
+  .skylegend span{display:inline-flex;align-items:center;gap:0.35rem;}
+  .skylegend i{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  @media(max-width:560px){.skychart-box{flex-basis:170px;max-width:170px;margin:0 auto;}}
+
   /* aurora — dark-hours Kp rows */
   .kp-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);}
   .kp-legend span{display:inline-flex;align-items:center;gap:0.35rem;}
@@ -250,10 +260,27 @@
   .kpr-track{flex:1;height:15px;background:rgba(0,0,0,0.28);border-radius:8px;overflow:hidden;}
   .kpr-fill{height:100%;border-radius:8px;}
   .kpr-k{font-family:'Spline Sans Mono',monospace;font-weight:700;font-size:0.82rem;width:18px;text-align:right;flex:none;}
-  .kp-quiet .kpr-fill{background:#3f6472;} .kp-quiet .kpr-k{color:var(--foam-dim);}
-  .kp-build .kpr-fill{background:#b89a3e;} .kp-build .kpr-k{color:var(--gold);}
-  .kp-possible .kpr-fill{background:var(--gold);} .kp-possible .kpr-k{color:var(--gold);}
+  .kp-quiet .kpr-fill{background:#37505d;} .kp-quiet .kpr-k{color:var(--foam-dim);}
+  .kp-low .kpr-fill{background:#4a7c8c;} .kp-low .kpr-k{color:#8fb4c2;}
+  .kp-watch .kpr-fill{background:#e9b949;} .kp-watch .kpr-k{color:var(--gold);}
+  .kp-possible .kpr-fill{background:#e8853a;} .kp-possible .kpr-k{color:#e8853a;}
   .kp-likely .kpr-fill{background:#5fd39a;box-shadow:0 0 10px rgba(95,211,154,0.6);} .kp-likely .kpr-k{color:#5fd39a;}
+
+  /* aurora status badge + gauges */
+  .aurora-badge{display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;margin-top:0.8rem;padding:0.7rem 1rem;border-radius:12px;border:1px solid var(--line);}
+  .aurora-badge .ab-word{font-family:'Archivo';font-weight:900;font-size:1.15rem;letter-spacing:0.04em;padding:0.1rem 0.7rem;border-radius:100px;}
+  .aurora-badge .ab-sub{font-size:0.86rem;color:var(--foam-dim);}
+  .aurora-badge.ab-quiet{background:rgba(160,190,190,0.06);} .ab-quiet .ab-word{background:#37505d;color:var(--foam);}
+  .aurora-badge.ab-watch{background:rgba(233,185,73,0.12);border-color:rgba(233,185,73,0.4);} .ab-watch .ab-word{background:var(--gold);color:var(--abyss);}
+  .aurora-badge.ab-go{background:rgba(95,211,154,0.14);border-color:rgba(95,211,154,0.5);} .ab-go .ab-word{background:#5fd39a;color:var(--abyss);}
+  .aurora-alert{margin-top:0.7rem;padding:0.6rem 0.9rem;border-radius:10px;background:rgba(227,111,92,0.14);border:1px solid rgba(227,111,92,0.4);font-size:0.82rem;color:#f2d3cc;line-height:1.45;}
+  .aurora-alert b{color:var(--coral);}
+  .aurora-gauges{display:flex;gap:1.3rem;flex-wrap:wrap;margin-top:0.9rem;}
+  .aurora-gauges .ag{display:flex;flex-direction:column;gap:0.12rem;}
+  .aurora-gauges .ag-k{font-family:'Spline Sans Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--foam-dim);}
+  .aurora-gauges .ag-v{font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:1.05rem;}
+  .aurora-gauges .ag-v span{font-size:0.68rem;color:var(--foam-dim);}
+  .aurora-gauges .ag-d{font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);}
 </style>
 </head>
 <body>
@@ -859,6 +886,9 @@ function renderPhoto(){
     <h3 class="block">Sun &amp; moon <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">rise, set &amp; where on the horizon</span></h3>
     <div class="astro-grid"><div id="sunBox"></div><div id="moonBox"></div></div>
 
+    <h3 class="block">Milky Way &amp; sky positions <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">where the core, sun &amp; moon sit tonight</span></h3>
+    <div id="skyPos"></div>
+
     <h3 class="block">Aurora forecast <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">Kp outlook · next few nights</span></h3>
     <div id="auroraBox"><div class="loading"><span class="pulse"></span>Checking space weather…</div></div>
 
@@ -878,9 +908,10 @@ function renderPhoto(){
   });
 
   loadPhotoData(lat,lon);
-  renderSunMoon(lat,lon);   // instant (no API)
-  renderAstro();            // instant (no API)
-  loadAurora();             // NOAA space-weather fetch
+  renderSunMoon(lat,lon);       // instant (no API)
+  renderSkyPositions(lat,lon);  // instant (no API)
+  renderAstro();                // instant (no API)
+  loadAurora();                 // NOAA space-weather fetch
 }
 
 async function loadPhotoData(lat,lon){
@@ -1059,18 +1090,120 @@ function renderSunMoon(lat,lon){
   </div>`;
 }
 
+/* ---------- Milky Way & sky positions (no API — pure astronomy) ---------- */
+// equatorial (RA/Dec deg) -> horizontal {az compass°, alt°} at a place & time
+function skyPos(raDeg, decDeg, date, lat, lon){
+  const rad=Math.PI/180;
+  const JD=date.getTime()/86400000+2440587.5, dd=JD-2451545.0;
+  let GMST=(280.46061837+360.98564736629*dd)%360; if(GMST<0)GMST+=360;
+  let LST=(GMST+lon)%360; if(LST<0)LST+=360;
+  let H=((LST-raDeg)%360+360)%360; if(H>180)H-=360;
+  const Hr=H*rad, dec=decDeg*rad, phi=lat*rad;
+  const alt=Math.asin(Math.sin(dec)*Math.sin(phi)+Math.cos(dec)*Math.cos(phi)*Math.cos(Hr));
+  const azS=Math.atan2(Math.sin(Hr), Math.cos(Hr)*Math.sin(phi)-Math.tan(dec)*Math.cos(phi));
+  let az=(azS*180/Math.PI+180)%360; if(az<0)az+=360;
+  return {az, alt:alt*180/Math.PI};
+}
+const GC={ra:266.417, dec:-29.008};   // Milky Way galactic center (Sagittarius)
+
+// top-down sky chart: centre = overhead, edge = horizon; radius encodes altitude
+function skyChart(core, best, sunSet, moon){
+  const R=80, cx=100, cy=100, rad=Math.PI/180;
+  const P=(az,alt)=>{ const r=R*(90-Math.max(0,Math.min(90,alt)))/90; return [cx+r*Math.sin(az*rad), cy-r*Math.cos(az*rad)]; };
+  let s=`<svg viewBox="0 0 200 200" class="skychart" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<circle cx="100" cy="100" r="${R}" fill="rgba(10,20,24,0.55)" stroke="var(--line)" stroke-width="1"/>`;
+  s+=`<circle cx="100" cy="100" r="${R/2}" fill="none" stroke="var(--line)" stroke-width="0.75" stroke-dasharray="2 3"/>`;
+  s+=`<circle cx="100" cy="100" r="1.6" fill="var(--foam-dim)"/>`;
+  s+=`<text x="100" y="15" fill="#9db4b3" font-size="9" text-anchor="middle" font-family="monospace">N</text>`;
+  s+=`<text x="193" y="103" fill="#9db4b3" font-size="9" text-anchor="middle" font-family="monospace">E</text>`;
+  s+=`<text x="100" y="198" fill="#9db4b3" font-size="9" text-anchor="middle" font-family="monospace">S</text>`;
+  s+=`<text x="7" y="103" fill="#9db4b3" font-size="9" text-anchor="middle" font-family="monospace">W</text>`;
+  if(core&&core.length>1){ const pts=core.map(c=>P(c.az,c.alt).map(n=>n.toFixed(1)).join(",")).join(" ");
+    s+=`<polyline points="${pts}" fill="none" stroke="#9d8ff0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`; }
+  if(sunSet){ const [x,y]=P(sunSet.az,0); s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="#e9b949"/><text x="${x.toFixed(1)}" y="${(y-9).toFixed(1)}" fill="#e9b949" font-size="8" text-anchor="middle" font-family="monospace">sunset</text>`; }
+  if(moon&&moon.alt>0){ const [x,y]=P(moon.az,moon.alt); s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="#cfe0ec"/><text x="${x.toFixed(1)}" y="${(y-8).toFixed(1)}" fill="#cfe0ec" font-size="8" text-anchor="middle" font-family="monospace">moon</text>`; }
+  if(best){ const [x,y]=P(best.az,best.alt); s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="#b6a9ff" stroke="#0a1418" stroke-width="1"/><text x="${x.toFixed(1)}" y="${(y+15).toFixed(1)}" fill="#b6a9ff" font-size="8" text-anchor="middle" font-family="monospace">core</text>`; }
+  s+=`</svg>`;
+  return s;
+}
+
+function renderSkyPositions(lat,lon){
+  const el=document.getElementById("skyPos"); if(!el)return;
+  const now=new Date();
+  const t1=SunCalc.getTimes(now,lat,lon), t2=SunCalc.getTimes(new Date(+now+864e5),lat,lon);
+  const ok=d=>d&&!isNaN(+d);
+  let darkStart=ok(t1.night)?t1.night:(ok(t1.nauticalDusk)?t1.nauticalDusk:t1.dusk);
+  let darkEnd=ok(t2.nightEnd)?t2.nightEnd:(ok(t2.nauticalDawn)?t2.nauticalDawn:t2.dawn);
+  const astro=ok(t1.night)&&ok(t2.nightEnd);
+  const sunSet={az:compassFrom(SunCalc.getPosition(t1.sunset,lat,lon).azimuth).deg};
+  // sample the core across tonight's dark window
+  const core=[]; let best=null;
+  if(ok(darkStart)&&ok(darkEnd)&&+darkEnd>+darkStart){
+    for(let ms=+darkStart; ms<=+darkEnd; ms+=20*60000){
+      const d=new Date(ms), p=skyPos(GC.ra,GC.dec,d,lat,lon);
+      if(p.alt>-2) core.push({t:d, az:p.az, alt:p.alt});
+      if(p.alt>0 && (!best||p.alt>best.alt)) best={t:d, az:p.az, alt:p.alt};
+    }
+  }
+  const mi=SunCalc.getMoonIllumination(now), moonPct=Math.round(mi.fraction*100);
+  const moonAtBest=best?(()=>{ const mp=SunCalc.getMoonPosition(best.t,lat,lon); return {az:compassFrom(mp.azimuth).deg, alt:mp.altitude*180/Math.PI}; })():null;
+  const chart=skyChart(core.filter(c=>c.alt>0), best, sunSet, moonAtBest);
+  const dir16=deg=>{const n=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];return n[Math.round(deg/22.5)%16];};
+  const fT=d=>d.toLocaleTimeString("en-US",{timeZone:"America/Los_Angeles",hour:"numeric",minute:"2-digit"}).replace(/\s/g,"").toLowerCase();
+  let verdict, vcol="var(--sky)";
+  if(!best){ vcol="var(--foam-dim)"; verdict="The Milky Way core stays below the horizon during tonight's dark hours. Core season on this coast runs roughly late February (pre-dawn) through October (after dark) — brightest May–August."; }
+  else {
+    const moonWashes=moonAtBest&&moonAtBest.alt>0&&moonPct>40, dir=dir16(best.az);
+    if(!astro){ vcol="var(--gold)"; verdict=`The core peaks about <b>${Math.round(best.alt)}° up in the ${dir}</b> around <b>${fT(best.t)}</b> — but the sky never fully darkens this time of year (no astronomical night), so it stays faint.${moonWashes?` A ${moonPct}% moon doesn't help.`:""}`; }
+    else if(moonWashes){ vcol="var(--gold)"; verdict=`The core is up — peaks <b>${Math.round(best.alt)}° in the ${dir}</b> around <b>${fT(best.t)}</b> — but a <b>${moonPct}% moon</b> is out and will wash it out. Better on a darker night near new moon.`; }
+    else { vcol="#b6a9ff"; verdict=`Good window tonight — face <b>${dir}</b> (${best.az.toFixed(0)}°); the core peaks about <b>${Math.round(best.alt)}° up</b> around <b>${fT(best.t)}</b>. ${moonPct<=25?"Nice and dark, near new moon.":"Moon's out of the way then."} It rides low over the southern horizon, so find a clear sightline — sea stacks make great foreground.`; }
+  }
+  el.innerHTML=`<div class="panel">
+    <div class="skywrap">
+      <div class="skychart-box">${chart}</div>
+      <div class="skydetail">
+        <div style="font-size:0.88rem;line-height:1.55;color:var(--foam-dim);"><b style="color:${vcol}">${best?"":"Not tonight. "}</b>${verdict}</div>
+        <div class="skylegend"><span><i style="background:#9d8ff0"></i>Milky Way core</span><span><i style="background:#e9b949"></i>sunset</span><span><i style="background:#cfe0ec"></i>moon</span></div>
+      </div>
+    </div>
+    <div style="margin-top:0.9rem;padding-top:0.85rem;border-top:1px solid var(--line);font-size:0.8rem;color:var(--foam-dim);line-height:1.5;">
+      The chart shows the sky from above — centre is straight overhead, the edge is the horizon. Sun sets toward <b style="color:var(--gold)">${dir16(sunSet.az)} (${sunSet.az.toFixed(0)}°)</b>. Moon is <b>${moonPct}% lit</b>.
+    </div>
+  </div>`;
+}
+
 /* ---------- Aurora: NOAA SWPC Kp forecast (long outlook) ---------- */
 // Oregon coast (~geomag 51°N): aurora on the north horizon needs a real storm.
 function kpColor(k){ return k>=7?"var(--coral)":k>=5?"var(--gold)":"var(--kelp)"; }
 const KP_POSSIBLE=6, KP_LIKELY=7;   // Oregon-coast north-horizon thresholds
 function fmtHour(h){ h=((h%24)+24)%24; if(h===0)return"12am"; if(h===12)return"12pm"; return h<12?h+"am":(h-12)+"pm"; }
+// most recent active geomagnetic storm watch/warning (last 48h, G-storm or K6+)
+function activeGeoAlert(alerts){
+  if(!alerts||!alerts.length) return null;
+  const now=Date.now();
+  for(const a of alerts){
+    const t=Date.parse(String(a.issue_datetime||"").replace(" ","T")+"Z");
+    if(isNaN(t) || (now-t)>48*3600e3) continue;
+    if(!/geomagnetic/i.test(a.message||"")) continue;
+    const m=(a.message||"").match(/(WATCH|WARNING|ALERT):\s*([^\r\n]+)/i);
+    if(m && /storm|k-index of [6-9]/i.test(m[2])) return {kind:m[1].toUpperCase(), text:m[2].trim()};
+  }
+  return null;
+}
 function loadAurora(){
   const el=document.getElementById("auroraBox"); if(!el)return;
   const [lat,lon]=SPOT_COORDS[activeSpot]||SPOT_COORDS["south-beach"];
   const spotName=(beachData&&beachData.spot&&beachData.spot.name)||"the Oregon coast";
-  fetch("https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json")
-    .then(r=>{ if(!r.ok)throw 0; return r.json(); })
-    .then(rows=>{
+  const J=u=>fetch(u).then(r=>r.ok?r.json():null).catch(()=>null);
+  Promise.all([
+    J("https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json"),
+    J("https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json"),
+    J("https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json"),
+    J("https://services.swpc.noaa.gov/products/noaa-scales.json"),
+    J("https://services.swpc.noaa.gov/products/alerts.json")
+  ])
+    .then(([rows,mag,speed,scales,alerts])=>{
+      if(!rows) throw 0;
       const nowMs=Date.now();
       const data=rows.filter(r=>r&&r.time_tag&&r.kp!=null)
         .map(r=>({dt:new Date(r.time_tag+"Z"), kp:parseFloat(r.kp), obs:r.observed}))
@@ -1108,19 +1241,43 @@ function loadAurora(){
       if(maxKp>=KP_LIKELY){ vhead="Get out there."; vcol="#5fd39a"; verdict=`A real chance — Kp peaks near <b>${maxKp.toFixed(1)}</b> ${bestLbl} around ${bestTime}. Head to a dark, north-facing beach away from town lights and look low to the north.`; }
       else if(maxKp>=KP_POSSIBLE){ vhead="Worth a look."; vcol="var(--gold)"; verdict=`Kp could reach <b>${maxKp.toFixed(1)}</b> ${bestLbl} around ${bestTime} — enough for a faint glow low on the northern horizon if skies stay clear. No promises, but keep an eye north.`; }
       else { vhead="Quiet."; vcol="var(--foam-dim)"; verdict=`The forecast peaks at Kp <b>${maxKp.toFixed(1)}</b> during dark hours — below the ~Kp ${KP_POSSIBLE} this coast needs before aurora clears the horizon. Nothing expected here.`; }
+      // --- extra predictors: live Bz, wind speed, G-storm forecast, active watch ---
+      const bz=(mag&&mag[0]&&mag[0].bz_gsm!=null)?Math.round(mag[0].bz_gsm*10)/10:null;
+      const spd=(speed&&speed[0]&&speed[0].proton_speed!=null)?Math.round(speed[0].proton_speed):null;
+      let activeG=0, predGmax=0;
+      if(scales){ activeG=+((scales["0"]&&scales["0"].G&&scales["0"].G.Scale)||0)||0;
+        ["1","2","3"].forEach(k=>{ if(scales[k]&&scales[k].G) predGmax=Math.max(predGmax, +(scales[k].G.Scale||0)||0); }); }
+      const geoAlert=activeGeoAlert(alerts);
+      let bzTxt="—",bzCol="var(--foam-dim)",bzRead="no data";
+      if(bz!=null){ bzTxt=(bz>0?"+":"")+bz+" nT";
+        if(bz<=-5){bzCol="#5fd39a";bzRead="southward — favorable";}
+        else if(bz<0){bzCol="var(--gold)";bzRead="slightly south";}
+        else{bzCol="var(--foam-dim)";bzRead="northward — quiet";} }
+      const spdRead=spd==null?"":(spd>=600?"fast stream":spd>=500?"elevated":"normal");
+      let bWord,bCls,bSub;
+      if(maxKp>=KP_LIKELY||predGmax>=3){ bWord="GO"; bCls="ab-go"; bSub="Aurora likely — get to a dark, north-facing beach."; }
+      else if(maxKp>=5||predGmax>=1||(geoAlert&&geoAlert.kind!=="ALERT")){ bWord="WATCH"; bCls="ab-watch"; bSub="Storm building — worth keeping an eye on the north."; }
+      else { bWord="QUIET"; bCls="ab-quiet"; bSub="Nothing brewing for this coast right now."; }
       const nightsHtml=show.map(n=>{
         const rowsH=n.rows.map(r=>{ const hr=+r.dt.toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(11,13);
-          const cls=r.kp>=KP_LIKELY?"kp-likely":r.kp>=KP_POSSIBLE?"kp-possible":r.kp>=5?"kp-build":"kp-quiet";
+          const cls=r.kp>=KP_LIKELY?"kp-likely":r.kp>=KP_POSSIBLE?"kp-possible":r.kp>=5?"kp-watch":r.kp>=4?"kp-low":"kp-quiet";
           const w=Math.max(4,Math.round(r.kp/9*100));
           return `<div class="kpr ${cls}"><span class="kpr-t">${fmtHour(hr)}</span><div class="kpr-track"><div class="kpr-fill" style="width:${w}%"></div></div><span class="kpr-k">${r.kp.toFixed(1)}</span></div>`; }).join("");
         return `<div class="kp-night"><div class="kp-nlabel">${nightLabel(n.date)}</div>${rowsH}</div>`;
       }).join("");
       el.innerHTML=`<div class="panel">
         <h3>Aurora — ${spotName} <span class="tag">hour by hour · dark only</span></h3>
-        <div style="margin-top:0.5rem;font-size:0.9rem;line-height:1.5;"><b style="color:${vcol}">${vhead}</b> <span style="color:var(--foam-dim)">${verdict}</span></div>
-        <div class="kp-legend"><span><i style="background:#5fd39a"></i>Kp ${KP_LIKELY}+ likely here</span><span><i style="background:var(--gold)"></i>Kp ${KP_POSSIBLE} possible</span><span><i style="background:#3f6472"></i>below threshold</span></div>
+        <div class="aurora-badge ${bCls}"><span class="ab-word">${bWord}</span><span class="ab-sub">${bSub}</span></div>
+        ${geoAlert?`<div class="aurora-alert">⚠ <b>NOAA ${geoAlert.kind}:</b> ${geoAlert.text}</div>`:""}
+        <div class="aurora-gauges">
+          <div class="ag"><span class="ag-k">Solar wind Bz</span><span class="ag-v" style="color:${bzCol}">${bzTxt}</span><span class="ag-d">${bzRead}</span></div>
+          <div class="ag"><span class="ag-k">Wind speed</span><span class="ag-v">${spd!=null?spd+"<span> km/s</span>":"—"}</span><span class="ag-d">${spdRead}</span></div>
+          <div class="ag"><span class="ag-k">Storm now / ahead</span><span class="ag-v">G${activeG}${predGmax>activeG?" → G"+predGmax:""}</span><span class="ag-d">${predGmax>=1?"unsettled ahead":"quiet"}</span></div>
+        </div>
+        <div style="margin-top:0.9rem;font-size:0.88rem;line-height:1.5;"><b style="color:${vcol}">${vhead}</b> <span style="color:var(--foam-dim)">${verdict}</span></div>
+        <div class="kp-legend"><span><i style="background:#5fd39a"></i>Kp ${KP_LIKELY}+ likely</span><span><i style="background:var(--gold)"></i>Kp 5–6 watch</span><span><i style="background:#3f6472"></i>quiet</span></div>
         ${nightsHtml}
-        <div style="margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);line-height:1.6;">Only ${spotName}'s dark hours are shown — aurora is invisible in daylight. Kp is a 3-hour index; hourly values are smoothed between NOAA's 3-hour steps to show the trend. This coast (~45°N) needs about Kp ${KP_POSSIBLE} for a faint glow, Kp ${KP_LIKELY}+ for a real show. Data: NOAA SWPC.</div>
+        <div style="margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);line-height:1.6;">Only ${spotName}'s dark hours shown. Kp interpolated hourly from NOAA's 3-hour steps. A southward Bz with high wind speed feeds a storm ~30–60 min before Kp reacts — the early warning. This coast (~45°N) needs ~Kp ${KP_POSSIBLE} for a glow, Kp ${KP_LIKELY}+ for a real show. Data: NOAA SWPC.</div>
       </div>`;
     })
     .catch(()=>{ el.innerHTML=`<div class="panel"><span style="color:var(--foam-dim)">Aurora forecast unavailable right now.</span></div>`; });
