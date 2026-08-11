@@ -281,6 +281,33 @@
   .aurora-gauges .ag-v{font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:1.05rem;}
   .aurora-gauges .ag-v span{font-size:0.68rem;color:var(--foam-dim);}
   .aurora-gauges .ag-d{font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);}
+
+  /* Night AR */
+  .ar-launch-btn{font-family:'Archivo';font-weight:800;font-size:1rem;color:var(--abyss);background:var(--gold);
+    border:none;border-radius:100px;padding:0.75rem 1.5rem;cursor:pointer;transition:transform 0.12s ease;}
+  .ar-launch-btn:hover{transform:translateY(-1px);}
+  #nightAR{position:fixed;inset:0;z-index:9999;background:#000;overflow:hidden;}
+  #arVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;}
+  #arCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;}
+  #arCanvas:active{cursor:grabbing;}
+  #nightAR .ar-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:0.7rem;
+    padding:calc(env(safe-area-inset-top,0px) + 0.7rem) 1rem 0.7rem;background:linear-gradient(180deg,rgba(0,0,0,0.6),transparent);}
+  #nightAR .ar-badge{font-family:'Spline Sans Mono',monospace;font-size:0.62rem;font-weight:600;letter-spacing:0.12em;
+    color:var(--abyss);background:var(--coral);padding:0.25rem 0.6rem;border-radius:100px;}
+  #nightAR .ar-time{font-family:'Spline Sans Mono',monospace;font-size:0.8rem;color:#fff;flex:1;}
+  #nightAR .ar-x{margin-left:auto;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);
+    background:rgba(0,0,0,0.4);color:#fff;font-size:1.1rem;cursor:pointer;}
+  #nightAR .ar-msg{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);max-width:80%;text-align:center;
+    font-family:'Archivo';font-size:0.95rem;color:#fff;text-shadow:0 1px 4px #000;line-height:1.5;}
+  #nightAR .ar-ctrl{position:absolute;left:0;right:0;bottom:0;padding:0.9rem 1rem calc(env(safe-area-inset-bottom,0px) + 1rem);
+    background:linear-gradient(0deg,rgba(0,0,0,0.65),transparent);display:flex;flex-direction:column;gap:0.7rem;}
+  #nightAR .ar-timerow{display:flex;align-items:center;gap:0.6rem;}
+  #nightAR .ar-tl,#nightAR .ar-tr{font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:rgba(255,255,255,0.7);}
+  #nightAR .ar-slider{flex:1;accent-color:var(--gold);}
+  #nightAR .ar-btns{display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;}
+  #nightAR .ar-btns button{font-family:'Archivo';font-weight:700;font-size:0.82rem;color:#fff;
+    background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:0.5rem 1rem;cursor:pointer;}
+  #nightAR .ar-hint{text-align:center;font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:rgba(255,255,255,0.6);}
 </style>
 </head>
 <body>
@@ -381,6 +408,27 @@
 </div>
 
 <div id="turnstile-holder" style="position:fixed;bottom:0;left:0;opacity:0;pointer-events:none;"></div>
+
+<!-- Night AR (beta) full-screen overlay -->
+<div id="nightAR" style="display:none;">
+  <video id="arVideo" playsinline muted autoplay></video>
+  <canvas id="arCanvas"></canvas>
+  <div class="ar-top">
+    <span class="ar-badge">NIGHT AR · BETA</span>
+    <span id="arTimeLbl" class="ar-time"></span>
+    <button class="ar-x" onclick="closeNightAR()" aria-label="Close">✕</button>
+  </div>
+  <div id="arMsg" class="ar-msg"></div>
+  <div class="ar-ctrl">
+    <div class="ar-timerow"><span class="ar-tl">Time</span><input id="arTimeSlider" type="range" min="0" max="10" step="0.5" value="0" class="ar-slider" oninput="arSetTime(this.value)"><span class="ar-tr">+10h</span></div>
+    <div class="ar-btns">
+      <button onclick="arZoom(5)">Zoom −</button>
+      <button onclick="arZoom(-5)">Zoom +</button>
+      <button onclick="arAlignMoon()">◎ Align to Moon</button>
+    </div>
+    <div class="ar-hint">Drag the view to fine-tune · slide Time to preview later tonight</div>
+  </div>
+</div>
 
 <script>
 /* ===== CONFIG ===== */
@@ -889,6 +937,9 @@ function renderPhoto(){
     <h3 class="block">Milky Way &amp; sky positions <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">where the core, sun &amp; moon sit tonight</span></h3>
     <div id="skyPos"></div>
 
+    <h3 class="block">Night AR <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--coral);text-transform:none;">beta · point your phone at the sky</span></h3>
+    <div id="arLaunch"></div>
+
     <h3 class="block">Aurora forecast <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">Kp outlook · next few nights</span></h3>
     <div id="auroraBox"><div class="loading"><span class="pulse"></span>Checking space weather…</div></div>
 
@@ -910,6 +961,7 @@ function renderPhoto(){
   loadPhotoData(lat,lon);
   renderSunMoon(lat,lon);       // instant (no API)
   renderSkyPositions(lat,lon);  // instant (no API)
+  renderNightARLaunch();        // instant (no API)
   renderAstro();                // instant (no API)
   loadAurora();                 // NOAA space-weather fetch
 }
@@ -1169,6 +1221,101 @@ function renderSkyPositions(lat,lon){
     <div style="margin-top:0.9rem;padding-top:0.85rem;border-top:1px solid var(--line);font-size:0.8rem;color:var(--foam-dim);line-height:1.5;">
       The chart shows the sky from above — centre is straight overhead, the edge is the horizon. Sun sets toward <b style="color:var(--gold)">${dir16(sunSet.az)} (${sunSet.az.toFixed(0)}°)</b>. Moon is <b>${moonPct}% lit</b>.
     </div>
+  </div>`;
+}
+
+/* ---------- Night AR (beta): live camera + projected sky overlay ---------- */
+// fixed-coordinate sky targets (RA/Dec deg). Sun & Moon added live from SunCalc.
+const AR_TARGETS=[
+  {n:"Milky Way core", ra:266.42, dec:-29.01, c:"#b6a9ff", big:true},
+  {n:"Andromeda M31", ra:10.68, dec:41.27, c:"#cfe0ec"},
+  {n:"Pleiades", ra:56.87, dec:24.11, c:"#cfe0ec"},
+  {n:"Orion Nebula", ra:83.82, dec:-5.39, c:"#cfe0ec"},
+  {n:"Lagoon Nebula", ra:270.9, dec:-24.38, c:"#cfe0ec"},
+  {n:"Hercules M13", ra:250.42, dec:36.46, c:"#cfe0ec"},
+  {n:"Double Cluster", ra:34.75, dec:57.13, c:"#cfe0ec"}
+];
+let arActive=false, arStream=null, arHFov=34, arAzOff=0, arAltOff=0, arTimeOff=0;
+let arRawAz=0, arRawAlt=0, arSmAz=0, arSmAlt=0, arLat=44.61, arLon=-124.07;
+const dirShort=deg=>["N","NE","E","SE","S","SW","W","NW"][Math.round(((deg%360)+360)%360/45)%8];
+
+function arObjects(){
+  const t=new Date(Date.now()+arTimeOff*3600e3);
+  const list=AR_TARGETS.map(o=>{ const p=skyPos(o.ra,o.dec,t,arLat,arLon); return {n:o.n,c:o.c,big:o.big,az:p.az,alt:p.alt}; });
+  const sp=SunCalc.getPosition(t,arLat,arLon); list.push({n:"Sun",c:"#e9b949",big:true,az:compassFrom(sp.azimuth).deg,alt:sp.altitude*180/Math.PI});
+  const mp=SunCalc.getMoonPosition(t,arLat,arLon); list.push({n:"Moon",c:"#eef4f8",big:true,az:compassFrom(mp.azimuth).deg,alt:mp.altitude*180/Math.PI});
+  return list;
+}
+function arOrient(e){
+  let h=(e.webkitCompassHeading!=null)?e.webkitCompassHeading:((e.alpha!=null&&e.absolute)?(360-e.alpha):null);
+  if(h!=null) arRawAz=h;
+  if(e.beta!=null) arRawAlt=e.beta-90;   // portrait: vertical(β90)=horizon, tilt top away to aim up
+}
+function arLoop(){
+  if(!arActive) return;
+  const cv=document.getElementById("arCanvas");
+  if(cv){
+    const dpr=Math.min(window.devicePixelRatio||1,2), W=cv.clientWidth, H=cv.clientHeight;
+    if(cv.width!==Math.round(W*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
+    const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+    let dA=((arRawAz-arSmAz+540)%360)-180; arSmAz=((arSmAz+dA*0.3)%360+360)%360; arSmAlt+=(arRawAlt-arSmAlt)*0.3;
+    const az0=(arSmAz+arAzOff+360)%360, alt0=arSmAlt+arAltOff, HF=arHFov, VF=arHFov*H/W;
+    const proj=(az,alt)=>{ let d=((az-az0+540)%360)-180; return [W/2+(d/HF)*(W/2), H/2-((alt-alt0)/VF)*(H/2), d]; };
+    // altitude arcs (0=horizon, 30, 60)
+    [0,30,60].forEach(a=>{ ctx.strokeStyle=a===0?"rgba(232,241,239,0.6)":"rgba(109,181,212,0.4)"; ctx.lineWidth=a===0?2:1.2;
+      ctx.beginPath(); let st=false;
+      for(let az=Math.floor(az0)-100; az<=az0+100; az+=4){ const [x,y,d]=proj(((az%360)+360)%360,a); if(Math.abs(d)<=100){ st?ctx.lineTo(x,y):(ctx.moveTo(x,y),st=true);} }
+      ctx.stroke(); });
+    // cardinal labels along the horizon
+    ctx.textAlign="center";
+    [["N",0],["NE",45],["E",90],["SE",135],["S",180],["SW",225],["W",270],["NW",315]].forEach(([lab,az])=>{ const [x,y,d]=proj(az,0); if(Math.abs(d)>HF*1.3) return;
+      ctx.font="700 15px sans-serif"; ctx.fillStyle="rgba(255,255,255,0.9)"; ctx.fillText(lab,x,y+5);
+      ctx.font="10px monospace"; ctx.fillStyle="rgba(255,255,255,0.55)"; ctx.fillText(az+"°",x,y+20); });
+    // sky targets
+    arObjects().forEach(o=>{ const [x,y,d]=proj(o.az,o.alt); if(Math.abs(d)>HF*1.4||o.alt<-6) return;
+      const r=o.big?10:6; ctx.globalAlpha=o.alt<0?0.35:1;
+      ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fillStyle=o.c; ctx.fill();
+      if(o.n==="Milky Way core"){ ctx.beginPath(); ctx.arc(x,y,r+5,0,7); ctx.strokeStyle=o.c; ctx.lineWidth=1.5; ctx.stroke(); }
+      ctx.globalAlpha=1; ctx.fillStyle=o.c; ctx.font="700 13px sans-serif"; ctx.fillText(o.n,x,y-r-6);
+      ctx.fillStyle="rgba(232,241,239,0.75)"; ctx.font="10px monospace"; ctx.fillText(Math.round(o.alt)+"° "+dirShort(o.az),x,y+r+15); });
+  }
+  requestAnimationFrame(arLoop);
+}
+async function openNightAR(){
+  const c=SPOT_COORDS[activeSpot]||SPOT_COORDS["south-beach"]; arLat=c[0]; arLon=c[1];
+  arTimeOff=0; arAzOff=0; arAltOff=0; arSmAz=arRawAz; arSmAlt=arRawAlt;
+  const ov=document.getElementById("nightAR"); ov.style.display="block";
+  const msg=document.getElementById("arMsg"); msg.textContent="Starting…";
+  try{ if(typeof DeviceOrientationEvent!=="undefined" && DeviceOrientationEvent.requestPermission){ await DeviceOrientationEvent.requestPermission(); } }catch(e){}
+  window.addEventListener("deviceorientation", arOrient, true);
+  try{
+    arStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
+    const v=document.getElementById("arVideo"); v.srcObject=arStream; await v.play(); msg.textContent="";
+  }catch(e){ msg.innerHTML="Camera unavailable — Night AR needs a phone with camera + motion access allowed in your browser settings."; }
+  arActive=true; arUpdateTimeLbl(); requestAnimationFrame(arLoop);
+  // drag to fine-tune heading / altitude
+  const cv=document.getElementById("arCanvas"); let px=null,py=null;
+  const dn=e=>{ const t=e.touches?e.touches[0]:e; px=t.clientX; py=t.clientY; };
+  const mv=e=>{ if(px==null)return; const t=e.touches?e.touches[0]:e; arAzOff+=(t.clientX-px)*(arHFov/cv.clientWidth); arAltOff-=(t.clientY-py)*(arHFov*cv.clientHeight/cv.clientWidth/cv.clientHeight); px=t.clientX; py=t.clientY; if(e.cancelable)e.preventDefault(); };
+  const up=()=>{ px=null; };
+  cv.ontouchstart=dn; cv.ontouchmove=mv; cv.ontouchend=up; cv.onmousedown=dn; window.onmousemove=mv; window.onmouseup=up;
+}
+function closeNightAR(){ arActive=false; document.getElementById("nightAR").style.display="none";
+  if(arStream){ arStream.getTracks().forEach(t=>t.stop()); arStream=null; }
+  window.removeEventListener("deviceorientation", arOrient, true); }
+function arAlignMoon(){ const m=arObjects().find(o=>o.n==="Moon"); const msg=document.getElementById("arMsg");
+  if(!m||m.alt<0){ msg.textContent="Moon isn't up — aim at a landmark you know and drag to line the grid up."; setTimeout(()=>msg.textContent="",3500); return; }
+  arAzOff=((m.az-arSmAz+540)%360)-180; arAltOff=m.alt-arSmAlt; msg.textContent="Aligned to the Moon."; setTimeout(()=>msg.textContent="",1800); }
+function arZoom(d){ arHFov=Math.max(16,Math.min(52,arHFov+d)); }
+function arSetTime(v){ arTimeOff=+v; arUpdateTimeLbl(); }
+function arUpdateTimeLbl(){ const t=new Date(Date.now()+arTimeOff*3600e3); const el=document.getElementById("arTimeLbl"); if(el) el.textContent=(arTimeOff<0.25?"now · ":"")+t.toLocaleString("en-US",{timeZone:"America/Los_Angeles",weekday:"short",hour:"numeric",minute:"2-digit"}); }
+function renderNightARLaunch(){
+  const el=document.getElementById("arLaunch"); if(!el)return;
+  const mobile=('ontouchstart' in window)||navigator.maxTouchPoints>0;
+  el.innerHTML=`<div class="panel">
+    <p style="font-size:0.92rem;color:var(--foam-dim);line-height:1.55;">Point your phone at the coast and see where the Milky Way core, moon, sun and deep-sky targets sit in the real sky — PhotoPills-style, right in your browser. Scrub the time slider to plan where the core will be later tonight.${mobile?"":" <b style='color:var(--gold)'>Built for phones</b> — open this page on your mobile for the compass &amp; tilt sensors."}</p>
+    <button class="ar-launch-btn" onclick="openNightAR()">🌌 Launch Night AR</button>
+    <div style="margin-top:0.7rem;font-size:0.76rem;color:var(--foam-dim);line-height:1.5;"><b style="color:var(--kelp)">Beta.</b> It rides the phone's magnetic compass, so it can sit a few degrees off — tap <b>Align to Moon</b> (when it's up) or drag the view to line the grid up with something you know. Also tracks Andromeda, Pleiades, Orion, the Lagoon, and the Double Cluster.</div>
   </div>`;
 }
 
