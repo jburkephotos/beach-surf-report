@@ -249,6 +249,16 @@
   .skylegend i{width:11px;height:11px;border-radius:50%;display:inline-block;}
   @media(max-width:560px){.skychart-box{flex-basis:170px;max-width:170px;margin:0 auto;}}
 
+  /* planets tonight */
+  .planet-list{display:flex;flex-direction:column;gap:0.15rem;}
+  .planet-row{display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid rgba(160,190,190,0.08);flex-wrap:wrap;}
+  .planet-row:last-child{border-bottom:none;}
+  .pl-dot{width:13px;height:13px;border-radius:50%;flex:none;box-shadow:0 0 6px rgba(255,255,255,0.15);}
+  .pl-name{font-weight:800;font-size:0.95rem;min-width:74px;}
+  .pl-pos{font-family:'Spline Sans Mono',monospace;font-size:0.8rem;color:var(--sky);}
+  .pl-note{font-size:0.78rem;color:var(--foam-dim);margin-left:auto;}
+  @media(max-width:560px){.pl-note{margin-left:0;width:100%;}}
+
   /* aurora — dark-hours Kp rows */
   .kp-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);}
   .kp-legend span{display:inline-flex;align-items:center;gap:0.35rem;}
@@ -257,8 +267,10 @@
   .kp-nlabel{font-family:'Spline Sans Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--foam);margin-bottom:0.45rem;font-weight:600;}
   .kpr{display:flex;align-items:center;gap:0.7rem;padding:0.18rem 0;}
   .kpr-t{font-family:'Spline Sans Mono',monospace;font-size:0.68rem;color:var(--foam-dim);width:58px;flex:none;}
-  .kpr-track{flex:1;height:15px;background:rgba(0,0,0,0.28);border-radius:8px;overflow:hidden;}
+  .kpr-track{position:relative;flex:1;height:15px;background:rgba(0,0,0,0.28);border-radius:8px;overflow:hidden;}
   .kpr-fill{height:100%;border-radius:8px;}
+  .kpr-thresh{position:absolute;top:0;bottom:0;left:66.7%;width:2px;background:rgba(255,255,255,0.45);}
+  .thresh-swatch{width:2px !important;height:12px !important;border-radius:0 !important;background:rgba(255,255,255,0.6);}
   .kpr-k{font-family:'Spline Sans Mono',monospace;font-weight:700;font-size:0.82rem;width:18px;text-align:right;flex:none;}
   .kp-quiet .kpr-fill{background:#37505d;} .kp-quiet .kpr-k{color:var(--foam-dim);}
   .kp-low .kpr-fill{background:#4a7c8c;} .kp-low .kpr-k{color:#8fb4c2;}
@@ -937,6 +949,9 @@ function renderPhoto(){
     <h3 class="block">Milky Way &amp; sky positions <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">where the core, sun &amp; moon sit tonight</span></h3>
     <div id="skyPos"></div>
 
+    <h3 class="block">Planets tonight <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">where the planets sit right now</span></h3>
+    <div id="planetsBox"></div>
+
     <h3 class="block">Night AR <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--coral);text-transform:none;">beta · point your phone at the sky</span></h3>
     <div id="arLaunch"></div>
 
@@ -961,6 +976,7 @@ function renderPhoto(){
   loadPhotoData(lat,lon);
   renderSunMoon(lat,lon);       // instant (no API)
   renderSkyPositions(lat,lon);  // instant (no API)
+  renderPlanets(lat,lon);       // instant (no API)
   renderNightARLaunch();        // instant (no API)
   renderAstro();                // instant (no API)
   loadAurora();                 // NOAA space-weather fetch
@@ -1224,6 +1240,63 @@ function renderSkyPositions(lat,lon){
   </div>`;
 }
 
+/* ---------- Planets (compact ephemeris, Paul Schlyter — geocentric RA/Dec) ---------- */
+const PLANET_EL={
+  Mercury:{N:[48.3313,3.24587e-5],i:[7.0047,5.00e-8],w:[29.1241,1.01444e-5],a:[0.387098,0],e:[0.205635,5.59e-10],M:[168.6562,4.0923344368]},
+  Venus:{N:[76.6799,2.46590e-5],i:[3.3946,2.75e-8],w:[54.8910,1.38374e-5],a:[0.723330,0],e:[0.006773,-1.302e-9],M:[48.0052,1.6021302244]},
+  Mars:{N:[49.5574,2.11081e-5],i:[1.8497,-1.78e-8],w:[286.5016,2.92961e-5],a:[1.523688,0],e:[0.093405,2.516e-9],M:[18.6021,0.5240207766]},
+  Jupiter:{N:[100.4542,2.76854e-5],i:[1.3030,-1.557e-7],w:[273.8777,1.64505e-5],a:[5.20256,0],e:[0.048498,4.469e-9],M:[19.8950,0.0830853001]},
+  Saturn:{N:[113.6634,2.38980e-5],i:[2.4886,-1.081e-7],w:[339.3939,2.97661e-5],a:[9.55475,0],e:[0.055546,-9.499e-9],M:[316.9670,0.0334442282]},
+  Uranus:{N:[74.0005,1.3978e-5],i:[0.7733,1.9e-8],w:[96.6612,3.0565e-5],a:[19.18171,-1.55e-8],e:[0.047318,7.45e-9],M:[142.5905,0.011725806]},
+  Neptune:{N:[131.7806,3.0173e-5],i:[1.7700,-2.55e-7],w:[272.8461,-6.027e-6],a:[30.05826,3.313e-8],e:[0.008606,2.15e-9],M:[260.2471,0.005995147]}
+};
+const PLANET_INFO={
+  Mercury:{c:"#c9b18a",naked:true,note:"elusive — low in bright twilight"},
+  Venus:{c:"#fff3c4",naked:true,note:"brilliant, the brightest 'star'"},
+  Mars:{c:"#e8703a",naked:true,note:"reddish, steady"},
+  Jupiter:{c:"#ecdcaf",naked:true,note:"bright and steady"},
+  Saturn:{c:"#e6c76a",naked:true,note:"golden — rings in a scope"},
+  Uranus:{c:"#a8d8e8",naked:false,note:"binoculars"},
+  Neptune:{c:"#8fa8e8",naked:false,note:"telescope only"}
+};
+const PLANET_NAMES=["Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune"];
+function _rev(x){ x=x%360; return x<0?x+360:x; }
+function _dayNum(date){ const Y=date.getUTCFullYear(),M=date.getUTCMonth()+1,D=date.getUTCDate(),
+  UT=date.getUTCHours()+date.getUTCMinutes()/60+date.getUTCSeconds()/3600;
+  return 367*Y-Math.floor(7*(Y+Math.floor((M+9)/12))/4)+Math.floor(275*M/9)+D-730530+UT/24; }
+function planetRaDec(name,date){
+  const R=Math.PI/180, d=_dayNum(date), el=PLANET_EL[name];
+  const N=_rev(el.N[0]+el.N[1]*d), i=el.i[0]+el.i[1]*d, w=_rev(el.w[0]+el.w[1]*d),
+        a=el.a[0]+el.a[1]*d, e=el.e[0]+el.e[1]*d, M=_rev(el.M[0]+el.M[1]*d);
+  let E=M+(180/Math.PI)*e*Math.sin(M*R)*(1+e*Math.cos(M*R));
+  for(let k=0;k<6;k++){ E=E-(E-(180/Math.PI)*e*Math.sin(E*R)-M)/(1-e*Math.cos(E*R)); }
+  const xv=a*(Math.cos(E*R)-e), yv=a*Math.sqrt(1-e*e)*Math.sin(E*R);
+  const v=_rev(Math.atan2(yv,xv)/R), r=Math.sqrt(xv*xv+yv*yv), vw=(v+w)*R, Nr=N*R, ir=i*R;
+  const xh=r*(Math.cos(Nr)*Math.cos(vw)-Math.sin(Nr)*Math.sin(vw)*Math.cos(ir));
+  const yh=r*(Math.sin(Nr)*Math.cos(vw)+Math.cos(Nr)*Math.sin(vw)*Math.cos(ir));
+  const zh=r*Math.sin(vw)*Math.sin(ir);
+  const ws=_rev(282.9404+4.70935e-5*d), es=0.016709-1.151e-9*d, Ms=_rev(356.0470+0.9856002585*d);
+  const Es=Ms+(180/Math.PI)*es*Math.sin(Ms*R)*(1+es*Math.cos(Ms*R));
+  const xvs=Math.cos(Es*R)-es, yvs=Math.sqrt(1-es*es)*Math.sin(Es*R);
+  const lonsun=(_rev(Math.atan2(yvs,xvs)/R)+ws)*R, rs=Math.sqrt(xvs*xvs+yvs*yvs);
+  const xg=xh+rs*Math.cos(lonsun), yg=yh+rs*Math.sin(lonsun), zg=zh, ecl=(23.4393-3.563e-7*d)*R;
+  const xe=xg, ye=yg*Math.cos(ecl)-zg*Math.sin(ecl), ze=yg*Math.sin(ecl)+zg*Math.cos(ecl);
+  return { ra:_rev(Math.atan2(ye,xe)/R), dec:Math.atan2(ze,Math.sqrt(xe*xe+ye*ye))/R };
+}
+function renderPlanets(lat,lon){
+  const el=document.getElementById("planetsBox"); if(!el)return;
+  const now=new Date();
+  const rows=PLANET_NAMES.map(p=>{ const rd=planetRaDec(p,now), sp=skyPos(rd.ra,rd.dec,now,lat,lon); return {p,az:sp.az,alt:sp.alt}; })
+    .filter(r=>r.alt>0).sort((a,b)=>b.alt-a.alt);
+  const dir=deg=>["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"][Math.round(deg/22.5)%16];
+  const spot=(beachData&&beachData.spot&&beachData.spot.name)||"this beach";
+  if(!rows.length){ el.innerHTML=`<div class="panel"><span style="color:var(--foam-dim)">No planets above the horizon right now — most planet-watching is after dark or before dawn. Night AR will still show where they are.</span></div>`; return; }
+  const items=rows.map(r=>{ const inf=PLANET_INFO[r.p];
+    return `<div class="planet-row"><span class="pl-dot" style="background:${inf.c}"></span><span class="pl-name">${r.p}</span><span class="pl-pos">${Math.round(r.alt)}° up · ${dir(r.az)} (${Math.round(r.az)}°)</span><span class="pl-note">${inf.note}${inf.naked?"":" · not naked-eye"}</span></div>`; }).join("");
+  el.innerHTML=`<div class="panel"><div class="planet-list">${items}</div>
+    <div style="margin-top:0.85rem;font-size:0.8rem;color:var(--foam-dim);line-height:1.5;">Positions right now from ${spot}. A bright planet low at dusk or riding beside the moon is a gift of a foreground-and-sky shot — and they all appear in <b style="color:var(--gold)">Night AR</b> above so you can line one up over a sea stack.</div></div>`;
+}
+
 /* ---------- Night AR (beta): live camera + projected sky overlay ---------- */
 // fixed-coordinate sky targets (RA/Dec deg). Sun & Moon added live from SunCalc.
 const AR_TARGETS=[
@@ -1244,6 +1317,7 @@ function arObjects(){
   const list=AR_TARGETS.map(o=>{ const p=skyPos(o.ra,o.dec,t,arLat,arLon); return {n:o.n,c:o.c,big:o.big,az:p.az,alt:p.alt}; });
   const sp=SunCalc.getPosition(t,arLat,arLon); list.push({n:"Sun",c:"#e9b949",big:true,az:compassFrom(sp.azimuth).deg,alt:sp.altitude*180/Math.PI});
   const mp=SunCalc.getMoonPosition(t,arLat,arLon); list.push({n:"Moon",c:"#eef4f8",big:true,az:compassFrom(mp.azimuth).deg,alt:mp.altitude*180/Math.PI});
+  PLANET_NAMES.forEach(p=>{ const rd=planetRaDec(p,t), s2=skyPos(rd.ra,rd.dec,t,arLat,arLon); list.push({n:p,c:PLANET_INFO[p].c,big:["Venus","Jupiter","Mars","Saturn"].indexOf(p)>=0,az:s2.az,alt:s2.alt}); });
   return list;
 }
 function arOrient(e){
@@ -1321,7 +1395,17 @@ function renderNightARLaunch(){
 
 /* ---------- Aurora: NOAA SWPC Kp forecast (long outlook) ---------- */
 // Oregon coast (~geomag 51°N): aurora on the north horizon needs a real storm.
-function kpColor(k){ return k>=7?"var(--coral)":k>=5?"var(--gold)":"var(--kelp)"; }
+// standard NOAA/aurora-app Kp scale: green (calm) -> yellow -> red (storm) -> purple
+function kpColor(k){
+  if(k<3)   return "#4fbf5f";   // green
+  if(k<4)   return "#8ec63f";   // lime
+  if(k<4.7) return "#e8cf34";   // yellow
+  if(k<5.5) return "#f39323";   // orange (G1)
+  if(k<6.5) return "#ef5f34";   // red-orange (G2)
+  if(k<7.5) return "#e23636";   // red (G3)
+  if(k<8.5) return "#d12b6e";   // magenta (G4)
+  return "#b026d3";             // purple (G5)
+}
 const KP_POSSIBLE=6, KP_LIKELY=7;   // Oregon-coast north-horizon thresholds
 function fmtHour(h){ h=((h%24)+24)%24; if(h===0)return"12am"; if(h===12)return"12pm"; return h<12?h+"am":(h-12)+"pm"; }
 // most recent active geomagnetic storm watch/warning (last 48h, G-storm or K6+)
@@ -1403,13 +1487,12 @@ function loadAurora(){
       const spdRead=spd==null?"":(spd>=600?"fast stream":spd>=500?"elevated":"normal");
       let bWord,bCls,bSub;
       if(maxKp>=KP_LIKELY||predGmax>=3){ bWord="GO"; bCls="ab-go"; bSub="Aurora likely — get to a dark, north-facing beach."; }
-      else if(maxKp>=5||predGmax>=1||(geoAlert&&geoAlert.kind!=="ALERT")){ bWord="WATCH"; bCls="ab-watch"; bSub="Storm building — worth keeping an eye on the north."; }
+      else if(maxKp>=5||predGmax>=2||(geoAlert&&geoAlert.kind!=="ALERT")){ bWord="WATCH"; bCls="ab-watch"; bSub="Storm building — worth keeping an eye on the north."; }
       else { bWord="QUIET"; bCls="ab-quiet"; bSub="Nothing brewing for this coast right now."; }
       const nightsHtml=show.map(n=>{
         const rowsH=n.rows.map(r=>{ const hr=+r.dt.toLocaleString("sv-SE",{timeZone:"America/Los_Angeles"}).slice(11,13);
-          const cls=r.kp>=KP_LIKELY?"kp-likely":r.kp>=KP_POSSIBLE?"kp-possible":r.kp>=5?"kp-watch":r.kp>=4?"kp-low":"kp-quiet";
-          const w=Math.max(4,Math.round(r.kp/9*100));
-          return `<div class="kpr ${cls}"><span class="kpr-t">${fmtHour(hr)}</span><div class="kpr-track"><div class="kpr-fill" style="width:${w}%"></div></div><span class="kpr-k">${r.kp.toFixed(1)}</span></div>`; }).join("");
+          const col=kpColor(r.kp), w=Math.max(4,Math.round(r.kp/9*100));
+          return `<div class="kpr"><span class="kpr-t">${fmtHour(hr)}</span><div class="kpr-track"><div class="kpr-fill" style="width:${w}%;background:${col}"></div><span class="kpr-thresh"></span></div><span class="kpr-k" style="color:${col}">${r.kp.toFixed(1)}</span></div>`; }).join("");
         return `<div class="kp-night"><div class="kp-nlabel">${nightLabel(n.date)}</div>${rowsH}</div>`;
       }).join("");
       el.innerHTML=`<div class="panel">
@@ -1422,7 +1505,7 @@ function loadAurora(){
           <div class="ag"><span class="ag-k">Storm now / ahead</span><span class="ag-v">G${activeG}${predGmax>activeG?" → G"+predGmax:""}</span><span class="ag-d">${predGmax>=1?"unsettled ahead":"quiet"}</span></div>
         </div>
         <div style="margin-top:0.9rem;font-size:0.88rem;line-height:1.5;"><b style="color:${vcol}">${vhead}</b> <span style="color:var(--foam-dim)">${verdict}</span></div>
-        <div class="kp-legend"><span><i style="background:#5fd39a"></i>Kp ${KP_LIKELY}+ likely</span><span><i style="background:var(--gold)"></i>Kp 5–6 watch</span><span><i style="background:#3f6472"></i>quiet</span></div>
+        <div class="kp-legend"><span><i style="background:#4fbf5f"></i>calm</span><span><i style="background:#e8cf34"></i>active</span><span><i style="background:#e23636"></i>storm</span><span><i class="thresh-swatch"></i>Kp 6 — visible from here</span></div>
         ${nightsHtml}
         <div style="margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);line-height:1.6;">Only ${spotName}'s dark hours shown. Kp interpolated hourly from NOAA's 3-hour steps. A southward Bz with high wind speed feeds a storm ~30–60 min before Kp reacts — the early warning. This coast (~45°N) needs ~Kp ${KP_POSSIBLE} for a glow, Kp ${KP_LIKELY}+ for a real show. Data: NOAA SWPC.</div>
       </div>`;
