@@ -259,6 +259,15 @@
   .pl-note{font-size:0.78rem;color:var(--foam-dim);margin-left:auto;}
   @media(max-width:560px){.pl-note{margin-left:0;width:100%;}}
 
+  /* dark skies / light pollution map */
+  .lp-btn{margin-top:1rem;font-family:'Archivo';font-weight:700;font-size:0.85rem;color:var(--foam);background:var(--glass);
+    border:1px solid var(--line);border-radius:100px;padding:0.55rem 1.2rem;cursor:pointer;transition:all 0.15s ease;}
+  .lp-btn:hover{border-color:var(--kelp);color:var(--kelp);}
+  .lp-map{display:none;height:340px;margin-top:0.9rem;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#0f2027;}
+  .lp-map .leaflet-container{background:#0a1418;font-family:'Spline Sans Mono',monospace;}
+  .lp-map .leaflet-control-attribution{font-size:9px;background:rgba(10,20,24,0.7);color:#9db4b3;}
+  .lp-map .leaflet-control-attribution a{color:#6db5d4;}
+
   /* aurora — dark-hours Kp rows */
   .kp-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.9rem;font-family:'Spline Sans Mono',monospace;font-size:0.62rem;color:var(--foam-dim);}
   .kp-legend span{display:inline-flex;align-items:center;gap:0.35rem;}
@@ -949,6 +958,9 @@ function renderPhoto(){
     <h3 class="block">Milky Way &amp; sky positions <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">where the core, sun &amp; moon sit tonight</span></h3>
     <div id="skyPos"></div>
 
+    <h3 class="block">Dark skies &amp; light pollution <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">how dark is it here — and where's darker</span></h3>
+    <div id="darkSky"></div>
+
     <h3 class="block">Planets tonight <span style="font-family:'Spline Sans Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--kelp);text-transform:none;">where the planets sit right now</span></h3>
     <div id="planetsBox"></div>
 
@@ -976,6 +988,7 @@ function renderPhoto(){
   loadPhotoData(lat,lon);
   renderSunMoon(lat,lon);       // instant (no API)
   renderSkyPositions(lat,lon);  // instant (no API)
+  renderDarkSky();              // instant (map lazy-loads on tap)
   renderPlanets(lat,lon);       // instant (no API)
   renderNightARLaunch();        // instant (no API)
   renderAstro();                // instant (no API)
@@ -1295,6 +1308,58 @@ function renderPlanets(lat,lon){
     return `<div class="planet-row"><span class="pl-dot" style="background:${inf.c}"></span><span class="pl-name">${r.p}</span><span class="pl-pos">${Math.round(r.alt)}° up · ${dir(r.az)} (${Math.round(r.az)}°)</span><span class="pl-note">${inf.note}${inf.naked?"":" · not naked-eye"}</span></div>`; }).join("");
   el.innerHTML=`<div class="panel"><div class="planet-list">${items}</div>
     <div style="margin-top:0.85rem;font-size:0.8rem;color:var(--foam-dim);line-height:1.5;">Positions right now from ${spot}. A bright planet low at dusk or riding beside the moon is a gift of a foreground-and-sky shot — and they all appear in <b style="color:var(--gold)">Night AR</b> above so you can line one up over a sea stack.</div></div>`;
+}
+
+/* ---------- Dark skies & light pollution ---------- */
+// curated per-spot darkness (approximate Bortle + nearest light dome)
+const DARKSKY={
+  "seaside-cove":{r:"Moderate",b:"4–5",dome:"Seaside and Astoria light the north and east",tip:"Fine for bright subjects; for the Milky Way, drop south to Oswald West."},
+  "short-sand":{r:"Fairly dark",b:"3",dome:"a little glow from Manzanita to the south",tip:"A solid dark pocket tucked under Cape Falcon."},
+  "pacific-city":{r:"Fairly dark",b:"3–4",dome:"Pacific City and a faint inland dome",tip:"Face west over the sea — Cape Kiwanda blocks the town glow."},
+  "otter-rock":{r:"Fairly dark",b:"3–4",dome:"Depoe Bay is small, but Newport glows to the south",tip:"Good; darkest just north toward Cape Foulweather."},
+  "agate-beach":{r:"Some glow",b:"4–5",dome:"Newport's dome sits right to the south",tip:"Bright southward — shoot north, or move to a darker beach."},
+  "south-beach":{r:"Some glow",b:"4",dome:"Newport lights the sky north across the bay",tip:"Face south and west away from town; darker still further south."},
+  "florence":{r:"Fairly dark",b:"4",dome:"Florence and the dune settlements glow to the north",tip:"The dunes south of town get dark quickly."},
+  "bastendorff":{r:"Some glow",b:"4–5",dome:"Coos Bay/North Bend is the coast's biggest light source, just east",tip:"Cape Arago to the south is the darker bet."},
+  "port-orford":{r:"Very dark",b:"2–3",dome:"almost nothing — one of the darkest towns on the coast",tip:"Prime Milky Way country. Worth the drive."}
+};
+function renderDarkSky(){
+  const el=document.getElementById("darkSky"); if(!el)return;
+  const d=DARKSKY[activeSpot]||DARKSKY["south-beach"];
+  const spot=(beachData&&beachData.spot&&beachData.spot.name)||"this beach";
+  const c=SPOT_COORDS[activeSpot]||SPOT_COORDS["south-beach"];
+  const col=d.r==="Very dark"?"#61CE70":d.r==="Fairly dark"?"#9acd32":d.r==="Moderate"?"#e9b949":"#e8853a";
+  el.innerHTML=`<div class="panel">
+    <div style="display:flex;align-items:baseline;gap:0.6rem;flex-wrap:wrap;">
+      <span style="font-family:'Archivo';font-weight:800;font-size:1.2rem;color:${col};">${d.r}</span>
+      <span style="font-family:'Spline Sans Mono',monospace;font-size:0.72rem;color:var(--foam-dim);">~Bortle ${d.b} · ${spot}</span>
+    </div>
+    <div style="font-size:0.88rem;color:var(--foam-dim);line-height:1.55;margin-top:0.5rem;">${d.dome.charAt(0).toUpperCase()+d.dome.slice(1)}. ${d.tip}</div>
+    <button class="lp-btn" id="lpMapBtn" onclick="loadLPMap()">🗺 Show light-pollution map</button>
+    <div id="lpMap" class="lp-map"></div>
+    <div style="margin-top:0.6rem;font-family:'Spline Sans Mono',monospace;font-size:0.6rem;color:var(--foam-dim);line-height:1.6;">Ratings approximate. City-lights layer: NASA VIIRS Black Marble. For the full brightness atlas, open <a href="https://www.lightpollutionmap.info/#zoom=9&lat=${c[0]}&lon=${c[1]}" target="_blank" rel="noopener" style="color:var(--kelp)">lightpollutionmap.info →</a></div>
+  </div>`;
+}
+let lpLoaded=false, lpMapObj=null;
+function loadLPMap(){
+  const btn=document.getElementById("lpMapBtn"), mapEl=document.getElementById("lpMap");
+  if(lpLoaded){ const show=mapEl.style.display==="none"; mapEl.style.display=show?"block":"none"; btn.textContent=show?"Hide map":"🗺 Show light-pollution map"; if(show&&lpMapObj)setTimeout(()=>lpMapObj.invalidateSize(),60); return; }
+  btn.textContent="Loading map…";
+  const css=document.createElement("link"); css.rel="stylesheet"; css.href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(css);
+  const js=document.createElement("script"); js.src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js";
+  js.onload=()=>{ lpLoaded=true; buildLPMap(); btn.textContent="Hide map"; };
+  js.onerror=()=>{ btn.textContent="Map couldn't load — tap the lightpollutionmap.info link below"; };
+  document.head.appendChild(js);
+}
+function buildLPMap(){
+  const mapEl=document.getElementById("lpMap"); mapEl.style.display="block";
+  const c=SPOT_COORDS[activeSpot]||SPOT_COORDS["south-beach"];
+  const map=L.map(mapEl,{scrollWheelZoom:false,attributionControl:true}).setView([c[0],c[1]],8); lpMapObj=map;
+  L.tileLayer("https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",{maxZoom:9,attribution:"© CARTO · © OpenStreetMap"}).addTo(map);
+  L.tileLayer("https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2016-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png",{maxNativeZoom:8,maxZoom:9,opacity:0.82,attribution:"NASA EOSDIS GIBS · VIIRS Black Marble"}).addTo(map);
+  Object.keys(SPOT_COORDS).forEach(k=>{ const cc=SPOT_COORDS[k], sel=k===activeSpot;
+    L.circleMarker([cc[0],cc[1]],{radius:sel?8:5,color:sel?"#F1AC1E":"#9db4b3",weight:2,fillColor:sel?"#F1AC1E":"#16323d",fillOpacity:0.95})
+      .addTo(map).bindTooltip((beachData&&beachData.spots&&(beachData.spots.find(s=>s.key===k)||{}).name)||k.replace(/-/g," "),{direction:"top"}); });
 }
 
 /* ---------- Night AR (beta): live camera + projected sky overlay ---------- */
